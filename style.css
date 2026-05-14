@@ -78,7 +78,7 @@ header nav ul li a.btn:hover {
 
 .hero {
   height: 400px;
-  background-image: url("https://raw.githubusercontent.com/christianmedicalclinic/my-christianclinicweb/main/background.jpeg"); /* correct! */
+  background-image: url("CLINIC.jpeg"); /* correct! */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
