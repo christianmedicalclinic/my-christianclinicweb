@@ -31,11 +31,13 @@ const db = new Pool({
 // ------------------------
 const transporter = nodemailer.createTransport({
 
-    host: 'smtp.gmail.com',
+    host: "smtp.gmail.com",
 
-    port: 465,
+    port: 587,
 
-    secure: true,
+    secure: false,
+
+    requireTLS: true,
 
     auth: {
 
@@ -43,13 +45,7 @@ const transporter = nodemailer.createTransport({
 
         pass: process.env.EMAIL_PASS
 
-    },
-
-    tls: {
-        rejectUnauthorized: false
-    },
-
-    connectionTimeout: 10000
+    }
 
 });
 
