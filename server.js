@@ -12,7 +12,7 @@ const db = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-// TEST DB (SAFE)
+// SAFE DB TEST
 (async () => {
     try {
         await db.query("SELECT 1");
@@ -42,6 +42,7 @@ app.get('/booking', (req, res) => res.sendFile(path.join(__dirname, 'booking.htm
 
 // BOOK APPOINTMENT
 app.post('/book-appointment', async (req, res) => {
+
     const { fullname, email, phone, service, date, time } = req.body;
 
     if (!fullname || !email || !phone || !service || !date || !time) {
@@ -49,8 +50,10 @@ app.post('/book-appointment', async (req, res) => {
     }
 
     try {
+
+        // IMPORTANT FIX: use "appointment_date" (NOT "date")
         const countDay = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE date = $1",
+            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
             [date]
         );
 
@@ -59,7 +62,7 @@ app.post('/book-appointment', async (req, res) => {
         }
 
         const countSlot = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE date = $1 AND time = $2",
+            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
             [date, time]
         );
 
@@ -67,28 +70,32 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "Slot is fully booked." });
         }
 
+        // INSERT FIXED
         await db.query(
-            `INSERT INTO appointments (fullname, email, phone, service, date, time)
+            `INSERT INTO appointments (fullname, email, phone, service, appointment_date, time)
              VALUES ($1,$2,$3,$4,$5,$6)`,
             [fullname, email, phone, service, date, time]
         );
 
+        // EMAIL
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Appointment Confirmation",
-            html: `<h3>Appointment Confirmed</h3><p>${service} on ${date} at ${time}</p>`
+            html: `<h3>Appointment Confirmed</h3>
+                   <p>${service}</p>
+                   <p>${date} at ${time}</p>`
         });
 
         return res.json({ message: "Booked successfully + email sent!" });
 
     } catch (err) {
-        console.log("ERROR:", err.message);
-        return res.status(500).json({ message: "Server error" });
+        console.log("FULL ERROR:", err.message);
+        return res.status(500).json({ message: "Server error: check logs" });
     }
 });
 
-// START
+// START SERVER
 app.listen(PORT, () => {
     console.log("Server running on port " + PORT);
 });
