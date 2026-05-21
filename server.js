@@ -7,10 +7,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ------------------------
-// DATABASE (SUPABASE POOLER)
+// DATABASE
 // ------------------------
 const db = new Pool({
-    user: 'postgres',
+    user: 'postgres.vutiinlpwninfnohxcpk',
     host: 'aws-0-ap-southeast-1.pooler.supabase.com',
     database: 'postgres',
     password: 'nrZRaYlGGyU2Cpoh',
@@ -23,10 +23,10 @@ const db = new Pool({
 // TEST DATABASE
 (async () => {
     try {
-        await db.query("SELECT 1");
-        console.log("Database connected");
+        await db.query('SELECT 1');
+        console.log('Database connected');
     } catch (err) {
-        console.log("DB ERROR:", err.message);
+        console.log('DB ERROR:', err.message);
     }
 })();
 
@@ -76,41 +76,43 @@ app.get('/admin-login', (req, res) => {
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
-    console.log("BOOK REQUEST RECEIVED");
-
-    const { fullname, email, phone, service, date, time } = req.body;
-
-    if (!fullname || !email || !phone || !service || !date || !time) {
-        return res.json({ message: "Please fill all fields" });
-    }
+    console.log('BOOK REQUEST RECEIVED');
 
     try {
 
+        const { fullname, email, phone, service, date, time } = req.body;
+
+        if (!fullname || !email || !phone || !service || !date || !time) {
+            return res.json({
+                message: 'Please fill all fields'
+            });
+        }
+
         // DAILY LIMIT
         const countDay = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
+            'SELECT COUNT(*) FROM appointments WHERE appointment_date = $1',
             [date]
         );
 
         if (parseInt(countDay.rows[0].count) >= 100) {
             return res.json({
-                message: "Fully booked for this date."
+                message: 'Fully booked for this date.'
             });
         }
 
         // SLOT LIMIT
         const countSlot = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
+            'SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2',
             [date, time]
         );
 
         if (parseInt(countSlot.rows[0].count) >= 12) {
             return res.json({
-                message: "Slot is fully booked."
+                message: 'Slot is fully booked.'
             });
         }
 
-        // INSERT APPOINTMENT
+        // INSERT
         await db.query(
             `INSERT INTO appointments
             (fullname, email, phone, service, appointment_date, time)
@@ -118,15 +120,15 @@ app.post('/book-appointment', async (req, res) => {
             [fullname, email, phone, service, date, time]
         );
 
-        console.log("Appointment inserted");
+        console.log('Appointment inserted');
 
-        // SEND EMAIL
+        // EMAIL
         try {
 
             await transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
-                subject: "Appointment Confirmation",
+                subject: 'Appointment Confirmation',
                 html: `
                     <h2>Appointment Confirmed</h2>
 
@@ -139,24 +141,24 @@ app.post('/book-appointment', async (req, res) => {
                 `
             });
 
-            console.log("Email sent");
+            console.log('Email sent');
 
         } catch (emailErr) {
 
-            console.log("EMAIL ERROR:", emailErr.message);
+            console.log('EMAIL ERROR:', emailErr.message);
 
         }
 
         return res.json({
-            message: "Appointment booked successfully!"
+            message: 'Appointment booked successfully!'
         });
 
     } catch (err) {
 
-        console.log("FULL ERROR:", err.message);
+        console.log('FULL ERROR:', err.message);
 
         return res.status(500).json({
-            message: "Server error"
+            message: err.message
         });
     }
 });
@@ -169,7 +171,7 @@ app.get('/appointments', async (req, res) => {
     try {
 
         const result = await db.query(
-            "SELECT * FROM appointments ORDER BY id DESC"
+            'SELECT * FROM appointments ORDER BY id DESC'
         );
 
         res.json(result.rows);
@@ -179,7 +181,7 @@ app.get('/appointments', async (req, res) => {
         console.log(err.message);
 
         res.status(500).json({
-            message: "Failed to fetch appointments"
+            message: 'Failed to fetch appointments'
         });
     }
 });
@@ -192,12 +194,12 @@ app.delete('/delete-appointment/:id', async (req, res) => {
     try {
 
         await db.query(
-            "DELETE FROM appointments WHERE id = $1",
+            'DELETE FROM appointments WHERE id = $1',
             [req.params.id]
         );
 
         res.json({
-            message: "Appointment deleted successfully."
+            message: 'Appointment deleted successfully.'
         });
 
     } catch (err) {
@@ -205,7 +207,7 @@ app.delete('/delete-appointment/:id', async (req, res) => {
         console.log(err.message);
 
         res.status(500).json({
-            message: "Delete failed"
+            message: 'Delete failed'
         });
     }
 });
