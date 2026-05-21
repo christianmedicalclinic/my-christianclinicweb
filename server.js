@@ -10,11 +10,7 @@ const PORT = process.env.PORT || 3000;
 // DATABASE
 // ------------------------
 const db = new Pool({
-    user: 'postgres.vutiinlpwninfnohxcpk',
-    host: 'aws-0-ap-southeast-1.pooler.supabase.com',
-    database: 'postgres',
-    password: 'nrZRaYlGGyU2Cpoh',
-    port: 6543,
+    connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false
     }
