@@ -214,10 +214,23 @@ const messageDiv = document.getElementById('message');
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    let formData = new FormData(form);
-    let data = Object.fromEntries(formData.entries());
+    messageDiv.textContent = "Booking appointment...";
+
+    const formData = new FormData(form);
+
+    const data = {
+        fullname: formData.get('fullname'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        service: formData.get('service'),
+        date: formData.get('date'),
+        time: formData.get('time')
+    };
+
+    console.log("Sending:", data);
 
     try {
+
         const response = await fetch('/book-appointment', {
             method: 'POST',
             headers: {
@@ -226,10 +239,18 @@ form.addEventListener('submit', async function(e) {
             body: JSON.stringify(data)
         });
 
-        const result = await response.json().catch(() => null);
+        console.log("STATUS:", response.status);
 
-        if (!result) {
-            messageDiv.textContent = "Server error (invalid response)";
+        const text = await response.text();
+
+        console.log("RAW RESPONSE:", text);
+
+        let result;
+
+        try {
+            result = JSON.parse(text);
+        } catch (err) {
+            messageDiv.textContent = "Server returned invalid JSON";
             return;
         }
 
@@ -240,8 +261,8 @@ form.addEventListener('submit', async function(e) {
         }
 
     } catch (error) {
-        console.log(error);
-        messageDiv.textContent = "Error booking appointment.";
+        console.log("FETCH ERROR:", error);
+        messageDiv.textContent = "Cannot connect to server";
     }
 });
 </script>
