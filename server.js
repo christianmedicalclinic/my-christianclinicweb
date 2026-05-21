@@ -18,10 +18,15 @@ const db = new Pool({
     }
 });
 
-// SAFE CONNECTION TEST (DO NOT CRASH DEPLOY)
-db.query("SELECT 1")
-    .then(() => console.log("Database connected (Supabase)"))
-    .catch(err => console.log("DB connection error:", err.message));
+// SAFE CONNECTION TEST (NO CRASH)
+(async () => {
+    try {
+        await db.query("SELECT 1");
+        console.log("Database connected (Supabase)");
+    } catch (err) {
+        console.log("DB connection error:", err.message);
+    }
+})();
 
 // ------------------------
 // EMAIL SETUP
@@ -50,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 // ------------------------
-// ROUTES (FRONTEND)
+// ROUTES
 // ------------------------
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -105,7 +110,7 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: `Slot ${time} is fully booked.` });
         }
 
-        // INSERT APPOINTMENT
+        // INSERT
         await db.query(
             `INSERT INTO appointments (fullname, email, phone, service, date, time)
              VALUES ($1, $2, $3, $4, $5, $6)`,
