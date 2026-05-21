@@ -117,45 +117,29 @@ app.post('/book-appointment', async (req, res) => {
 
         console.log('Appointment inserted');
 
-        // EMAIL
-        try {
+       // EMAIL (NON-BLOCKING)
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
 
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: 'Appointment Confirmation',
-                html: `
-                    <h2>Appointment Confirmed</h2>
+    transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Appointment Confirmation',
+        html: `
+            <h2>Appointment Confirmed</h2>
+            <p><strong>Name:</strong> ${fullname}</p>
+            <p><strong>Service:</strong> ${service}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Time:</strong> ${time}</p>
+        `
+    })
+    .then(() => {
+        console.log('Email sent');
+    })
+    .catch((err) => {
+        console.log('EMAIL ERROR:', err.message);
+    });
 
-                    <p><strong>Name:</strong> ${fullname}</p>
-                    <p><strong>Service:</strong> ${service}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Time:</strong> ${time}</p>
-
-                    <p>Thank you for choosing Christian Medical Clinic.</p>
-                `
-            });
-
-            console.log('Email sent');
-
-        } catch (emailErr) {
-
-            console.log('EMAIL ERROR:', emailErr.message);
-
-        }
-
-        return res.json({
-            message: 'Appointment booked successfully!'
-        });
-
-    } catch (err) {
-
-        console.log('FULL ERROR:', err.message);
-
-        return res.status(500).json({
-            message: err.message
-        });
-    }
+}
 });
 
 // ------------------------
