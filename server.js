@@ -5,7 +5,7 @@ const { Pool } = require('pg');
 
 const app = express();
 
-// PORT (Render uses this)
+// PORT
 const PORT = process.env.PORT || 3000;
 
 // ------------------------
@@ -18,11 +18,10 @@ const db = new Pool({
     }
 });
 
-// SAFE TEST (won’t crash deploy)
-db.query("SELECT 1", (err) => {
-    if (err) console.log("DB connection error:", err.message);
-    else console.log("Database connected (Supabase)");
-});
+// SAFE CONNECTION TEST (DO NOT CRASH DEPLOY)
+db.query("SELECT 1")
+    .then(() => console.log("Database connected (Supabase)"))
+    .catch(err => console.log("DB connection error:", err.message));
 
 // ------------------------
 // EMAIL SETUP
@@ -51,7 +50,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 // ------------------------
-// ROUTES
+// ROUTES (FRONTEND)
 // ------------------------
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -74,7 +73,7 @@ app.get('/booking', (req, res) => {
 });
 
 // ------------------------
-// BOOK APPOINTMENT (FIXED FOR POSTGRES)
+// BOOK APPOINTMENT
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
@@ -85,7 +84,8 @@ app.post('/book-appointment', async (req, res) => {
     }
 
     try {
-        // STEP 1: DAILY LIMIT
+
+        // DAILY LIMIT
         const countDay = await db.query(
             "SELECT COUNT(*) FROM appointments WHERE date = $1",
             [date]
@@ -95,7 +95,7 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "Fully booked for this date." });
         }
 
-        // STEP 2: SLOT LIMIT
+        // SLOT LIMIT
         const countSlot = await db.query(
             "SELECT COUNT(*) FROM appointments WHERE date = $1 AND time = $2",
             [date, time]
@@ -105,14 +105,14 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: `Slot ${time} is fully booked.` });
         }
 
-        // STEP 3: INSERT
+        // INSERT APPOINTMENT
         await db.query(
             `INSERT INTO appointments (fullname, email, phone, service, date, time)
              VALUES ($1, $2, $3, $4, $5, $6)`,
             [fullname, email, phone, service, date, time]
         );
 
-        // STEP 4: EMAIL
+        // EMAIL
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
@@ -144,7 +144,9 @@ app.post('/book-appointment', async (req, res) => {
 // ------------------------
 app.get('/appointments', async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM appointments ORDER BY id DESC");
+        const result = await db.query(
+            "SELECT * FROM appointments ORDER BY id DESC"
+        );
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -156,7 +158,10 @@ app.get('/appointments', async (req, res) => {
 // ------------------------
 app.delete('/delete-appointment/:id', async (req, res) => {
     try {
-        await db.query("DELETE FROM appointments WHERE id = $1", [req.params.id]);
+        await db.query(
+            "DELETE FROM appointments WHERE id = $1",
+            [req.params.id]
+        );
         res.json({ message: "Appointment deleted successfully." });
     } catch (err) {
         res.status(500).json({ message: err.message });
