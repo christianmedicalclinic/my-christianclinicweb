@@ -212,10 +212,13 @@ const form = document.getElementById('bookingForm');
 const messageDiv = document.getElementById('message');
 
 form.addEventListener('submit', async function(e) {
+
     e.preventDefault();
 
+    messageDiv.style.color = "black";
     messageDiv.textContent = "Booking appointment...";
 
+    // GET FORM DATA
     const formData = new FormData(form);
 
     const data = {
@@ -231,6 +234,7 @@ form.addEventListener('submit', async function(e) {
 
     try {
 
+        // SEND TO SERVER
         const response = await fetch('/book-appointment', {
             method: 'POST',
             headers: {
@@ -239,31 +243,38 @@ form.addEventListener('submit', async function(e) {
             body: JSON.stringify(data)
         });
 
-        console.log("STATUS:", response.status);
+        // GET JSON RESPONSE
+        const result = await response.json();
 
-        const text = await response.text();
+        console.log("SERVER RESPONSE:", result);
 
-        console.log("RAW RESPONSE:", text);
-
-        let result;
-
-        try {
-            result = JSON.parse(text);
-        } catch (err) {
-            messageDiv.textContent = "Server returned invalid JSON";
-            return;
-        }
-
+        // SHOW MESSAGE
         messageDiv.textContent = result.message;
 
+        // SUCCESS
         if (response.ok) {
+
+            messageDiv.style.color = "green";
+
+            // RESET FORM
             form.reset();
+
+        } else {
+
+            messageDiv.style.color = "red";
+
         }
 
     } catch (error) {
+
         console.log("FETCH ERROR:", error);
+
+        messageDiv.style.color = "red";
+
         messageDiv.textContent = "Cannot connect to server";
+
     }
+
 });
 </script>
 
