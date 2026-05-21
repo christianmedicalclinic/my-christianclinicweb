@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
-const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,27 +27,9 @@ const db = new Pool({
 })();
 
 // ------------------------
-// EMAIL SETUP
+// RESEND EMAIL SETUP
 // ------------------------
-const transporter = nodemailer.createTransport({
-
-    host: "smtp.gmail.com",
-
-    port: 587,
-
-    secure: false,
-
-    requireTLS: true,
-
-    auth: {
-
-        user: process.env.EMAIL_USER,
-
-        pass: process.env.EMAIL_PASS
-
-    }
-
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ------------------------
 // MIDDLEWARE
@@ -90,7 +72,6 @@ app.post('/book-appointment', async (req, res) => {
 
         const { fullname, email, phone, service, date, time } = req.body;
 
-        // VALIDATION
         if (!fullname || !email || !phone || !service || !date || !time) {
             return res.json({ message: "Please fill all fields" });
         }
@@ -115,7 +96,7 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "This time slot is fully booked." });
         }
 
-        // INSERT APPOINTMENT
+        // INSERT INTO SUPABASE
         await db.query(
             `INSERT INTO appointments
             (fullname, email, phone, service, appointment_date, time)
@@ -125,11 +106,13 @@ app.post('/book-appointment', async (req, res) => {
 
         console.log("Appointment inserted");
 
-        // EMAIL (NON-BLOCKING - NEVER BREAKS SYSTEM)
-        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        // ------------------------
+        // EMAIL (RESEND)
+        // ------------------------
+        try {
 
-            transporter.sendMail({
-                from: process.env.EMAIL_USER,
+            await resend.emails.send({
+                from: "Clinic <onboarding@resend.dev>",
                 to: email,
                 subject: "Appointment Confirmation",
                 html: `
@@ -139,12 +122,14 @@ app.post('/book-appointment', async (req, res) => {
                     <p><strong>Date:</strong> ${date}</p>
                     <p><strong>Time:</strong> ${time}</p>
                 `
-            })
-            .then(() => console.log("Email sent"))
-            .catch(err => console.log("EMAIL ERROR:", err.message));
+            });
+
+            console.log("EMAIL SENT SUCCESSFULLY");
+
+        } catch (err) {
+            console.log("EMAIL ERROR:", err.message);
         }
 
-        // ✅ IMPORTANT: ALWAYS RETURN RESPONSE
         return res.json({
             message: "Appointment booked successfully!"
         });
@@ -159,7 +144,7 @@ app.post('/book-appointment', async (req, res) => {
 });
 
 // ------------------------
-// GET APPOINTMENTS (DASHBOARD)
+// GET APPOINTMENTS
 // ------------------------
 app.get('/appointments', async (req, res) => {
 
