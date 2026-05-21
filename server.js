@@ -109,26 +109,29 @@ app.post('/book-appointment', async (req, res) => {
         // ------------------------
         // EMAIL (RESEND)
         // ------------------------
-        try {
+        const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-            await resend.emails.send({
-                from: "Clinic <onboarding@resend.dev>",
-                to: email,
-                subject: "Appointment Confirmation",
-                html: `
-                    <h2>Appointment Confirmed</h2>
-                    <p><strong>Name:</strong> ${fullname}</p>
-                    <p><strong>Service:</strong> ${service}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Time:</strong> ${time}</p>
-                `
-            });
+try {
 
-            console.log("EMAIL SENT SUCCESSFULLY");
+    const result = await resend.emails.send({
+        from: "Christian Medical Clinic <onboarding@resend.dev>",
+        to: email.trim(),
+        subject: "Appointment Confirmation",
+        html: `
+            <h2>Appointment Confirmed</h2>
+            <p><strong>Name:</strong> ${fullname}</p>
+            <p><strong>Service:</strong> ${service}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Time:</strong> ${time}</p>
+        `
+    });
 
-        } catch (err) {
-            console.log("EMAIL ERROR:", err.message);
-        }
+    console.log("RESEND RESULT:", result);
+
+} catch (err) {
+    console.log("RESEND ERROR:", err);
+}
 
         return res.json({
             message: "Appointment booked successfully!"
