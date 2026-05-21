@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ------------------------
-// DATABASE
+// DATABASE (SUPABASE)
 // ------------------------
 const db = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -15,7 +15,8 @@ const db = new Pool({
         rejectUnauthorized: false
     }
 });
-// TEST DATABASE
+
+// TEST DB CONNECTION
 (async () => {
     try {
         await db.query('SELECT 1');
@@ -44,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 // ------------------------
-// ROUTES
+// ROUTES (PAGES)
 // ------------------------
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -71,43 +72,38 @@ app.get('/admin-login', (req, res) => {
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
-    console.log('BOOK REQUEST RECEIVED');
+    console.log("BOOK REQUEST RECEIVED");
 
     try {
 
         const { fullname, email, phone, service, date, time } = req.body;
 
+        // VALIDATION
         if (!fullname || !email || !phone || !service || !date || !time) {
-            return res.json({
-                message: 'Please fill all fields'
-            });
+            return res.json({ message: "Please fill all fields" });
         }
 
         // DAILY LIMIT
         const countDay = await db.query(
-            'SELECT COUNT(*) FROM appointments WHERE appointment_date = $1',
+            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
             [date]
         );
 
         if (parseInt(countDay.rows[0].count) >= 100) {
-            return res.json({
-                message: 'Fully booked for this date.'
-            });
+            return res.json({ message: "Fully booked for this date." });
         }
 
         // SLOT LIMIT
         const countSlot = await db.query(
-            'SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2',
+            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
             [date, time]
         );
 
         if (parseInt(countSlot.rows[0].count) >= 12) {
-            return res.json({
-                message: 'Slot is fully booked.'
-            });
+            return res.json({ message: "This time slot is fully booked." });
         }
 
-        // INSERT
+        // INSERT APPOINTMENT
         await db.query(
             `INSERT INTO appointments
             (fullname, email, phone, service, appointment_date, time)
@@ -115,52 +111,58 @@ app.post('/book-appointment', async (req, res) => {
             [fullname, email, phone, service, date, time]
         );
 
-        console.log('Appointment inserted');
+        console.log("Appointment inserted");
 
-       // EMAIL (NON-BLOCKING)
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        // EMAIL (NON-BLOCKING - NEVER BREAKS SYSTEM)
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
 
-    transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Appointment Confirmation',
-        html: `
-            <h2>Appointment Confirmed</h2>
-            <p><strong>Name:</strong> ${fullname}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <p><strong>Date:</strong> ${date}</p>
-            <p><strong>Time:</strong> ${time}</p>
-        `
-    })
-    .then(() => {
-        console.log('Email sent');
-    })
-    .catch((err) => {
-        console.log('EMAIL ERROR:', err.message);
-    });
+            transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Appointment Confirmation",
+                html: `
+                    <h2>Appointment Confirmed</h2>
+                    <p><strong>Name:</strong> ${fullname}</p>
+                    <p><strong>Service:</strong> ${service}</p>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Time:</strong> ${time}</p>
+                `
+            })
+            .then(() => console.log("Email sent"))
+            .catch(err => console.log("EMAIL ERROR:", err.message));
+        }
 
-}
+        // ✅ IMPORTANT: ALWAYS RETURN RESPONSE
+        return res.json({
+            message: "Appointment booked successfully!"
+        });
+
+    } catch (err) {
+        console.log("FULL ERROR:", err.message);
+
+        return res.status(500).json({
+            message: "Server error: check logs"
+        });
+    }
 });
 
 // ------------------------
-// GET APPOINTMENTS
+// GET APPOINTMENTS (DASHBOARD)
 // ------------------------
 app.get('/appointments', async (req, res) => {
 
     try {
-
         const result = await db.query(
-            'SELECT * FROM appointments ORDER BY id DESC'
+            "SELECT * FROM appointments ORDER BY id DESC"
         );
 
         res.json(result.rows);
 
     } catch (err) {
-
         console.log(err.message);
 
         res.status(500).json({
-            message: 'Failed to fetch appointments'
+            message: "Failed to fetch appointments"
         });
     }
 });
@@ -171,22 +173,20 @@ app.get('/appointments', async (req, res) => {
 app.delete('/delete-appointment/:id', async (req, res) => {
 
     try {
-
         await db.query(
-            'DELETE FROM appointments WHERE id = $1',
+            "DELETE FROM appointments WHERE id = $1",
             [req.params.id]
         );
 
         res.json({
-            message: 'Appointment deleted successfully.'
+            message: "Appointment deleted successfully"
         });
 
     } catch (err) {
-
         console.log(err.message);
 
         res.status(500).json({
-            message: 'Delete failed'
+            message: "Delete failed"
         });
     }
 });
