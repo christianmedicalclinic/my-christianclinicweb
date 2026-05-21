@@ -6,23 +6,33 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// DATABASE
+// ------------------------
+// DATABASE (SUPABASE POOLER)
+// ------------------------
 const db = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    user: 'postgres',
+    host: 'aws-0-ap-southeast-1.pooler.supabase.com',
+    database: 'postgres',
+    password: 'nrZRaYlGGyU2Cpoh',
+    port: 6543,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-// SAFE DB TEST
+// TEST DATABASE
 (async () => {
     try {
         await db.query("SELECT 1");
         console.log("Database connected");
     } catch (err) {
-        console.log("DB error:", err.message);
+        console.log("DB ERROR:", err.message);
     }
 })();
 
-// EMAIL
+// ------------------------
+// EMAIL SETUP
+// ------------------------
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -31,17 +41,42 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// ------------------------
 // MIDDLEWARE
+// ------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
+// ------------------------
 // ROUTES
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/booking', (req, res) => res.sendFile(path.join(__dirname, 'booking.html')));
+// ------------------------
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
+app.get('/booking', (req, res) => {
+    res.sendFile(path.join(__dirname, 'booking.html'));
+});
+
+app.get('/services', (req, res) => {
+    res.sendFile(path.join(__dirname, 'services.html'));
+});
+
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(__dirname, 'contact.html'));
+});
+
+app.get('/admin-login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-login.html'));
+});
+
+// ------------------------
 // BOOK APPOINTMENT
+// ------------------------
 app.post('/book-appointment', async (req, res) => {
+
+    console.log("BOOK REQUEST RECEIVED");
 
     const { fullname, email, phone, service, date, time } = req.body;
 
@@ -51,51 +86,133 @@ app.post('/book-appointment', async (req, res) => {
 
     try {
 
-        // IMPORTANT FIX: use "appointment_date" (NOT "date")
+        // DAILY LIMIT
         const countDay = await db.query(
             "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
             [date]
         );
 
         if (parseInt(countDay.rows[0].count) >= 100) {
-            return res.json({ message: "Fully booked for this date." });
+            return res.json({
+                message: "Fully booked for this date."
+            });
         }
 
+        // SLOT LIMIT
         const countSlot = await db.query(
             "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
             [date, time]
         );
 
         if (parseInt(countSlot.rows[0].count) >= 12) {
-            return res.json({ message: "Slot is fully booked." });
+            return res.json({
+                message: "Slot is fully booked."
+            });
         }
 
-        // INSERT FIXED
+        // INSERT APPOINTMENT
         await db.query(
-            `INSERT INTO appointments (fullname, email, phone, service, appointment_date, time)
-             VALUES ($1,$2,$3,$4,$5,$6)`,
+            `INSERT INTO appointments
+            (fullname, email, phone, service, appointment_date, time)
+            VALUES ($1, $2, $3, $4, $5, $6)`,
             [fullname, email, phone, service, date, time]
         );
 
-        // EMAIL
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Appointment Confirmation",
-            html: `<h3>Appointment Confirmed</h3>
-                   <p>${service}</p>
-                   <p>${date} at ${time}</p>`
+        console.log("Appointment inserted");
+
+        // SEND EMAIL
+        try {
+
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Appointment Confirmation",
+                html: `
+                    <h2>Appointment Confirmed</h2>
+
+                    <p><strong>Name:</strong> ${fullname}</p>
+                    <p><strong>Service:</strong> ${service}</p>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Time:</strong> ${time}</p>
+
+                    <p>Thank you for choosing Christian Medical Clinic.</p>
+                `
+            });
+
+            console.log("Email sent");
+
+        } catch (emailErr) {
+
+            console.log("EMAIL ERROR:", emailErr.message);
+
+        }
+
+        return res.json({
+            message: "Appointment booked successfully!"
         });
 
-        return res.json({ message: "Booked successfully + email sent!" });
-
     } catch (err) {
+
         console.log("FULL ERROR:", err.message);
-        return res.status(500).json({ message: "Server error: check logs" });
+
+        return res.status(500).json({
+            message: "Server error"
+        });
     }
 });
 
+// ------------------------
+// GET APPOINTMENTS
+// ------------------------
+app.get('/appointments', async (req, res) => {
+
+    try {
+
+        const result = await db.query(
+            "SELECT * FROM appointments ORDER BY id DESC"
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            message: "Failed to fetch appointments"
+        });
+    }
+});
+
+// ------------------------
+// DELETE APPOINTMENT
+// ------------------------
+app.delete('/delete-appointment/:id', async (req, res) => {
+
+    try {
+
+        await db.query(
+            "DELETE FROM appointments WHERE id = $1",
+            [req.params.id]
+        );
+
+        res.json({
+            message: "Appointment deleted successfully."
+        });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({
+            message: "Delete failed"
+        });
+    }
+});
+
+// ------------------------
 // START SERVER
+// ------------------------
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+    console.log(`Server running on port ${PORT}`);
 });
