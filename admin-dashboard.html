@@ -116,7 +116,7 @@ h3 {
 <script>
 
 /* =========================
-   CONTACT MESSAGES (WORKING)
+   CONTACT MESSAGES
 ========================= */
 
 let messages = JSON.parse(localStorage.getItem("messages")) || [];
@@ -125,132 +125,307 @@ let messagesContainer = document.getElementById("messages");
 if (messages.length === 0) {
     messagesContainer.innerHTML = "<p>No messages yet.</p>";
 } else {
+
     messages.forEach((msg, index) => {
+
         messagesContainer.innerHTML += `
+
             <div class="msg-box">
+
                 <p><strong>Name:</strong> ${msg.name}</p>
+
                 <p><strong>Email:</strong> ${msg.email}</p>
+
                 <p>${msg.message}</p>
-                <button class="delete-btn" onclick="deleteMessage(${index})">Delete</button>
+
+                <button class="delete-btn"
+                    onclick="deleteMessage(${index})">
+                    Delete
+                </button>
+
             </div>
+
         `;
+
     });
+
 }
 
 function deleteMessage(index) {
-    let messages = JSON.parse(localStorage.getItem("messages")) || [];
+
+    let messages =
+        JSON.parse(localStorage.getItem("messages")) || [];
+
     if (confirm("Delete this message?")) {
+
         messages.splice(index, 1);
-        localStorage.setItem("messages", JSON.stringify(messages));
+
+        localStorage.setItem(
+            "messages",
+            JSON.stringify(messages)
+        );
+
         location.reload();
+
     }
+
 }
 
 
 /* =========================
-   APPOINTMENTS (FIXED LOCAL STORAGE)
+   APPOINTMENTS (SUPABASE DATABASE)
 ========================= */
 
-let appointments = JSON.parse(localStorage.getItem("bookings")) || [];
-let container = document.getElementById("appointments");
+async function loadAppointments() {
 
-if (appointments.length === 0) {
-    container.innerHTML = "<p>No appointments yet.</p>";
-} else {
+    let container = document.getElementById("appointments");
 
-    let groupedByDate = {};
+    try {
 
-    appointments.forEach((app, index) => {
-        if (!groupedByDate[app.date]) groupedByDate[app.date] = [];
-        groupedByDate[app.date].push({...app, index});
-    });
+        const response = await fetch('/appointments');
 
-    Object.keys(groupedByDate).sort().forEach(date => {
+        const appointments = await response.json();
 
-        let section = document.createElement("div");
-        section.className = "date-section";
+        console.log("APPOINTMENTS:", appointments);
 
-        let header = document.createElement("div");
-        header.className = "date-header";
-        header.innerHTML = `
-            <span>Date: ${date}</span>
-            <span class="date-counter">${groupedByDate[date].length} / 100</span>
-        `;
+        if (appointments.length === 0) {
 
-        section.appendChild(header);
+            container.innerHTML =
+                "<p>No appointments yet.</p>";
 
-        // DELETE ALL
-        let deleteAllBtn = document.createElement("button");
-        deleteAllBtn.className = "delete-btn";
-        deleteAllBtn.textContent = "Delete All";
+            return;
+        }
 
-        deleteAllBtn.onclick = function(e){
-            e.stopPropagation();
-            if(confirm("Delete all appointments for this date?")){
-                let updated = appointments.filter(a => a.date !== date);
-                localStorage.setItem("bookings", JSON.stringify(updated));
-                location.reload();
+        container.innerHTML = "";
+
+        let groupedByDate = {};
+
+        appointments.forEach(app => {
+
+            const date = app.appointment_date;
+
+            if (!groupedByDate[date]) {
+
+                groupedByDate[date] = [];
+
             }
-        };
 
-        header.appendChild(deleteAllBtn);
+            groupedByDate[date].push(app);
 
-        let content = document.createElement("div");
-        content.className = "date-content";
-
-        let groupedByTime = {};
-
-        groupedByDate[date].forEach(app => {
-            if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
-            groupedByTime[app.time].push(app);
         });
 
-        Object.keys(groupedByTime).sort().forEach(time => {
+        Object.keys(groupedByDate)
+        .sort()
+        .forEach(date => {
 
-            let timeHeader = document.createElement("div");
-            timeHeader.style.fontWeight = "bold";
-            timeHeader.textContent = `${time} → ${groupedByTime[time].length} / 12 booked`;
+            let section =
+                document.createElement("div");
 
-            content.appendChild(timeHeader);
+            section.className = "date-section";
 
-            groupedByTime[time].forEach(app => {
+            let header =
+                document.createElement("div");
 
-                let div = document.createElement("div");
-                div.className = "msg-box";
+            header.className = "date-header";
 
-                div.innerHTML = `
-                    <p><strong>Name:</strong> ${app.fullname}</p>
-                    <p><strong>Email:</strong> ${app.email}</p>
-                    <p><strong>Phone:</strong> ${app.phone}</p>
-                    <p><strong>Service:</strong> ${app.service}</p>
-                    <button class="delete-btn" onclick="deleteAppointment(${app.index})">Delete</button>
-                `;
+            header.innerHTML = `
 
-                content.appendChild(div);
+                <span>Date: ${date}</span>
+
+                <span class="date-counter">
+
+                    ${groupedByDate[date].length} / 100
+
+                </span>
+
+            `;
+
+            section.appendChild(header);
+
+            // DELETE ALL BUTTON
+            let deleteAllBtn =
+                document.createElement("button");
+
+            deleteAllBtn.className = "delete-btn";
+
+            deleteAllBtn.textContent = "Delete All";
+
+            deleteAllBtn.onclick = async function(e){
+
+                e.stopPropagation();
+
+                if(confirm(
+                    "Delete all appointments for this date?"
+                )){
+
+                    try {
+
+                        for (const app of groupedByDate[date]) {
+
+                            await fetch(
+                                `/delete-appointment/${app.id}`,
+                                {
+                                    method: 'DELETE'
+                                }
+                            );
+
+                        }
+
+                        loadAppointments();
+
+                    } catch (error) {
+
+                        console.log(error);
+
+                    }
+
+                }
+
+            };
+
+            header.appendChild(deleteAllBtn);
+
+            let content =
+                document.createElement("div");
+
+            content.className = "date-content";
+
+            let groupedByTime = {};
+
+            groupedByDate[date].forEach(app => {
+
+                if (!groupedByTime[app.time]) {
+
+                    groupedByTime[app.time] = [];
+
+                }
+
+                groupedByTime[app.time].push(app);
+
             });
+
+            Object.keys(groupedByTime)
+            .sort()
+            .forEach(time => {
+
+                let timeHeader =
+                    document.createElement("div");
+
+                timeHeader.style.fontWeight = "bold";
+
+                timeHeader.style.marginBottom = "10px";
+
+                timeHeader.textContent =
+
+                    `${time} → ${groupedByTime[time].length} / 12 booked`;
+
+                content.appendChild(timeHeader);
+
+                groupedByTime[time].forEach(app => {
+
+                    let div =
+                        document.createElement("div");
+
+                    div.className = "msg-box";
+
+                    div.innerHTML = `
+
+                        <p><strong>Name:</strong>
+                            ${app.fullname}
+                        </p>
+
+                        <p><strong>Email:</strong>
+                            ${app.email}
+                        </p>
+
+                        <p><strong>Phone:</strong>
+                            ${app.phone}
+                        </p>
+
+                        <p><strong>Service:</strong>
+                            ${app.service}
+                        </p>
+
+                        <button class="delete-btn"
+                            onclick="deleteAppointment(${app.id})">
+                            Delete
+                        </button>
+
+                    `;
+
+                    content.appendChild(div);
+
+                });
+
+            });
+
+            section.appendChild(content);
+
+            container.appendChild(section);
+
+            header.addEventListener("click", () => {
+
+                content.style.display =
+
+                    content.style.display === "none"
+
+                    ? "block"
+
+                    : "none";
+
+            });
+
         });
 
-        section.appendChild(content);
-        container.appendChild(section);
+    } catch (error) {
 
-        header.addEventListener("click", () => {
-            content.style.display =
-                content.style.display === "none" ? "block" : "none";
-        });
-    });
+        console.log("FETCH ERROR:", error);
+
+        container.innerHTML =
+
+            "<p>Failed to load appointments.</p>";
+
+    }
+
 }
 
 
 // DELETE ONE
-function deleteAppointment(index){
-    let appointments = JSON.parse(localStorage.getItem("bookings")) || [];
+async function deleteAppointment(id){
 
     if(confirm("Delete this appointment?")){
-        appointments.splice(index, 1);
-        localStorage.setItem("bookings", JSON.stringify(appointments));
-        location.reload();
+
+        try {
+
+            const response = await fetch(
+
+                `/delete-appointment/${id}`,
+
+                {
+                    method: 'DELETE'
+                }
+
+            );
+
+            const result = await response.json();
+
+            alert(result.message);
+
+            loadAppointments();
+
+        } catch(error){
+
+            console.log(error);
+
+        }
+
     }
+
 }
+
+
+// LOAD APPOINTMENTS
+loadAppointments();
 
 </script>
 
