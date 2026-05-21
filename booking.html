@@ -17,7 +17,6 @@ body{
   background:#dfe6e9;
 }
 
-/* HEADER */
 header{
   background:#0a8f08;
   color:white;
@@ -50,7 +49,6 @@ nav a{
   font-size:1rem;
 }
 
-/* MAIN SECTION */
 .container{
   display:flex;
   justify-content:space-between;
@@ -62,7 +60,6 @@ nav a{
 .left{
   flex:1 1 300px;
   max-width:500px;
-  margin-bottom:30px;
 }
 
 .left h2{
@@ -73,7 +70,6 @@ nav a{
 
 .info{
   margin-top:30px;
-  font-size:1rem;
 }
 
 .info p{
@@ -86,7 +82,6 @@ nav a{
   background:#eeeeee;
   padding:30px;
   border-radius:12px;
-  margin-bottom:30px;
 }
 
 input, select{
@@ -137,16 +132,6 @@ button:hover{
     padding:15px 20px;
     flex-direction: column;
     align-items:flex-start;
-    gap:10px;
-  }
-
-  .left h2{
-    font-size:2rem;
-  }
-
-  input, select{
-    font-size:0.95rem;
-    padding:12px;
   }
 
   button{
@@ -178,27 +163,25 @@ button:hover{
 <div class="info">
 <p>📞 901-5090/759-7116</p>
 <p>📧 christianmed.inc23@yahoo.com</p>
-<p>📍 22-B Madison Street,New Manila Quezon City</p>
+<p>📍 22-B Madison Street, New Manila Quezon City</p>
 </div>
 </div>
 
 <div class="right">
 <form id="bookingForm">
+
 <input type="text" name="fullname" placeholder="Full Name" required>
 <input type="email" name="email" placeholder="Email" required>
 <input type="text" name="phone" placeholder="Phone Number" required>
 
 <select name="service" required>
 <option value="">Select Service</option>
-<option value="Annual Physical Exam (APE)">Annual Physical Exam (APE)</option>
+<option value="Annual Physical Exam (APE)">APE</option>
 <option value="Outpatient Services">Outpatient Services</option>
-<option value="Full set of services">Full set of services</option>
 <option value="Consultation">Consultation</option>
 <option value="Dental">Dental</option>
 <option value="Laboratory">Laboratory</option>
 <option value="X-RAY">X-RAY</option>
-<option value="Psychological testing">Psychological testing</option>
-<option value="Optical">Optical</option>
 <option value="Vaccination">Vaccination</option>
 </select>
 
@@ -218,12 +201,12 @@ button:hover{
 
 <button type="submit">Book Appointment</button>
 <div class="message" id="message"></div>
+
 </form>
 </div>
 
 </section>
 
-<!-- ✅ FIXED SCRIPT -->
 <script>
 const form = document.getElementById('bookingForm');
 const messageDiv = document.getElementById('message');
@@ -243,7 +226,16 @@ form.addEventListener('submit', async function(e) {
             body: JSON.stringify(data)
         });
 
-        const result = await response.json();
+        const text = await response.text();
+
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch (e) {
+            messageDiv.textContent = "Server error (not JSON response)";
+            console.log(text);
+            return;
+        }
 
         messageDiv.textContent = result.message;
 
