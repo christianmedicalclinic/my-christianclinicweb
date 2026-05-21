@@ -12,10 +12,10 @@ const PORT = process.env.PORT || 3000;
 // MYSQL DATABASE CONNECTION
 // ------------------------
 const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'clinic_db',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -28,13 +28,13 @@ db.query("SELECT 1", (err) => {
 });
 
 // ------------------------
-// Nodemailer Setup
+// Nodemailer Setup (FIXED)
 // ------------------------
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER || 'christianmedicalclinic701@gmail.com',
-        pass: process.env.EMAIL_PASS || 'YOUR_NEW_APP_PASSWORD'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -74,7 +74,7 @@ app.get('/booking', (req, res) => {
 });
 
 // ------------------------
-// BOOK APPOINTMENT (FIXED)
+// BOOK APPOINTMENT (FIXED EMAIL)
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
@@ -84,7 +84,7 @@ app.post('/book-appointment', async (req, res) => {
         return res.json({ message: "Please fill all fields" });
     }
 
-    // STEP 1: CHECK DAILY LIMIT (100)
+    // STEP 1: DAILY LIMIT
     db.query(
         "SELECT COUNT(*) AS count FROM appointments WHERE date = ?",
         [date],
@@ -95,10 +95,10 @@ app.post('/book-appointment', async (req, res) => {
             }
 
             if (result[0].count >= 100) {
-                return res.json({ message: "Sorry, fully booked for this date." });
+                return res.json({ message: "Fully booked for this date." });
             }
 
-            // STEP 2: CHECK SLOT LIMIT (12)
+            // STEP 2: SLOT LIMIT
             db.query(
                 "SELECT COUNT(*) AS count FROM appointments WHERE date = ? AND time = ?",
                 [date, time],
@@ -110,11 +110,11 @@ app.post('/book-appointment', async (req, res) => {
 
                     if (result2[0].count >= 12) {
                         return res.json({
-                            message: `Sorry, the ${time} slot is fully booked.`
+                            message: `Slot ${time} is fully booked.`
                         });
                     }
 
-                    // STEP 3: INSERT INTO MYSQL
+                    // STEP 3: SAVE TO DATABASE
                     const sql = `
                         INSERT INTO appointments
                         (fullname, email, phone, service, date, time)
@@ -133,7 +133,7 @@ app.post('/book-appointment', async (req, res) => {
 
                             console.log("Appointment saved");
 
-                            // STEP 4: SEND EMAIL
+                            // STEP 4: SEND EMAIL (FIXED)
                             const mailOptions = {
                                 from: process.env.EMAIL_USER,
                                 to: email,
@@ -152,14 +152,16 @@ app.post('/book-appointment', async (req, res) => {
                             };
 
                             try {
-                                await transporter.sendMail(mailOptions);
+                                const info = await transporter.sendMail(mailOptions);
+
+                                console.log("EMAIL SENT:", info.response);
 
                                 return res.json({
-                                    message: "Appointment booked successfully! Email sent."
+                                    message: "Appointment booked + email sent!"
                                 });
 
                             } catch (error) {
-                                console.log("Email error:", error);
+                                console.log("EMAIL ERROR:", error);
 
                                 return res.json({
                                     message: "Booked but email failed."
