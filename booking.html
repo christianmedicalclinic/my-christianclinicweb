@@ -3,159 +3,280 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Appointments Dashboard</title>
+<title>Book Appointment</title>
 
 <style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+}
 
 body{
-    font-family: Arial, sans-serif;
-    background:#f5f5f5;
-    padding:30px;
+  background:#dfe6e9;
 }
 
-h1{
-    color:#0a8f08;
-    margin-bottom:20px;
+header{
+  background:#0a8f08;
+  color:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 60px;
+  flex-wrap: wrap;
 }
 
-table{
-    width:100%;
-    border-collapse: collapse;
-    background:white;
+header h1{
+  font-size:2rem;
+  margin-bottom:10px;
 }
 
-th, td{
-    border:1px solid #ccc;
-    padding:12px;
-    text-align:center;
+nav{
+  display:flex;
+  gap:15px;
+  flex-wrap: wrap;
 }
 
-th{
-    background:#0a8f08;
-    color:white;
+nav li{
+  list-style:none;
+}
+
+nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:1rem;
+}
+
+.container{
+  display:flex;
+  justify-content:space-between;
+  padding:70px 100px;
+  flex-wrap: wrap;
+  gap:20px;
+}
+
+.left{
+  flex:1 1 300px;
+  max-width:500px;
+}
+
+.left h2{
+  font-size:2.5rem;
+  color:#0a8f08;
+  margin-bottom:20px;
+}
+
+.info{
+  margin-top:30px;
+}
+
+.info p{
+  margin-bottom:20px;
+}
+
+.right{
+  flex:1 1 300px;
+  max-width:500px;
+  background:#eeeeee;
+  padding:30px;
+  border-radius:12px;
+}
+
+input, select{
+  width:100%;
+  padding:14px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:1rem;
 }
 
 button{
-    background:red;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    cursor:pointer;
-    border-radius:5px;
+  background:#0a8f08;
+  color:white;
+  border:none;
+  padding:15px;
+  width:80%;
+  max-width:200px;
+  border-radius:8px;
+  font-size:1.1rem;
+  cursor:pointer;
+  display:block;
+  margin:20px auto;
 }
 
 button:hover{
-    opacity:0.8;
+  background:#066606;
 }
 
+.message{
+  margin-top:10px;
+  font-weight:bold;
+  text-align:center;
+}
+
+@media (max-width:900px){
+  .container{
+    flex-direction: column;
+    align-items: center;
+    padding:40px 20px;
+  }
+
+  .left, .right{
+    width:90%;
+  }
+
+  header{
+    padding:15px 20px;
+    flex-direction: column;
+    align-items:flex-start;
+  }
+
+  button{
+    width:100%;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<h1>Appointments Dashboard</h1>
+<header>
+<h1>Christian Medical Clinic</h1>
 
-<table>
+<nav>
+<li><a href="index.html">Home</a></li>
+<li><a href="services.html">Services</a></li>
+<li><a href="contact.html">Contact</a></li>
+<li><a href="booking.html">Book Appointment</a></li>
+</nav>
+</header>
 
-<thead>
-<tr>
-<th>ID</th>
-<th>Full Name</th>
-<th>Email</th>
-<th>Phone</th>
-<th>Service</th>
-<th>Date</th>
-<th>Time</th>
-<th>Action</th>
-</tr>
-</thead>
+<section class="container">
 
-<tbody id="tableBody">
+<div class="left">
+<h2>Book Appointment</h2>
+<p>Schedule your visit with our medical professionals.</p>
 
-</tbody>
+<div class="info">
+<p>📞 901-5090/759-7116</p>
+<p>📧 christianmed.inc23@yahoo.com</p>
+<p>📍 22-B Madison Street, New Manila Quezon City</p>
+</div>
+</div>
 
-</table>
+<div class="right">
+<form id="bookingForm">
+
+<input type="text" name="fullname" placeholder="Full Name" required>
+<input type="email" name="email" placeholder="Email" required>
+<input type="text" name="phone" placeholder="Phone Number" required>
+
+<select name="service" required>
+<option value="">Select Service</option>
+<option value="Annual Physical Exam (APE)">APE</option>
+<option value="Outpatient Services">Outpatient Services</option>
+<option value="Consultation">Consultation</option>
+<option value="Dental">Dental</option>
+<option value="Laboratory">Laboratory</option>
+<option value="X-RAY">X-RAY</option>
+<option value="Vaccination">Vaccination</option>
+</select>
+
+<input type="date" name="date" required>
+
+<select name="time" required>
+<option value="">Select Time</option>
+<option value="08:00">8:00 AM</option>
+<option value="09:00">9:00 AM</option>
+<option value="10:00">10:00 AM</option>
+<option value="11:00">11:00 AM</option>
+<option value="13:00">1:00 PM</option>
+<option value="14:00">2:00 PM</option>
+<option value="15:00">3:00 PM</option>
+<option value="16:00">4:00 PM</option>
+</select>
+
+<button type="submit">Book Appointment</button>
+<div class="message" id="message"></div>
+
+</form>
+</div>
+
+</section>
 
 <script>
+const form = document.getElementById('bookingForm');
+const messageDiv = document.getElementById('message');
 
-async function loadAppointments() {
+form.addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    messageDiv.style.color = "black";
+    messageDiv.textContent = "Booking appointment...";
+
+    // GET FORM DATA
+    const formData = new FormData(form);
+
+    const data = {
+        fullname: formData.get('fullname'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        service: formData.get('service'),
+        date: formData.get('date'),
+        time: formData.get('time')
+    };
+
+    console.log("Sending:", data);
 
     try {
 
-        // FETCH FROM YOUR EXPRESS SERVER
-        const response = await fetch('/appointments');
-
-        const appointments = await response.json();
-
-        console.log("APPOINTMENTS:", appointments);
-
-        const tableBody = document.getElementById('tableBody');
-
-        tableBody.innerHTML = '';
-
-        appointments.forEach(appointment => {
-
-            tableBody.innerHTML += `
-
-            <tr>
-
-                <td>${appointment.id}</td>
-                <td>${appointment.fullname}</td>
-                <td>${appointment.email}</td>
-                <td>${appointment.phone}</td>
-                <td>${appointment.service}</td>
-                <td>${appointment.appointment_date}</td>
-                <td>${appointment.time}</td>
-
-                <td>
-                    <button onclick="deleteAppointment(${appointment.id})">
-                        Delete
-                    </button>
-                </td>
-
-            </tr>
-
-            `;
-
+        // SEND TO SERVER
+        const response = await fetch('/book-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
+
+        // GET JSON RESPONSE
+        const result = await response.json();
+
+        console.log("SERVER RESPONSE:", result);
+
+        // SHOW MESSAGE
+        messageDiv.textContent = result.message;
+
+        // SUCCESS
+        if (response.ok) {
+
+            messageDiv.style.color = "green";
+
+            // RESET FORM
+            form.reset();
+
+        } else {
+
+            messageDiv.style.color = "red";
+
+        }
 
     } catch (error) {
 
         console.log("FETCH ERROR:", error);
 
-    }
+        messageDiv.style.color = "red";
 
-}
-
-// DELETE
-async function deleteAppointment(id) {
-
-    if (!confirm("Delete this appointment?")) return;
-
-    try {
-
-        const response = await fetch(`/delete-appointment/${id}`, {
-            method: 'DELETE'
-        });
-
-        const result = await response.json();
-
-        alert(result.message);
-
-        loadAppointments();
-
-    } catch (error) {
-
-        console.log(error);
+        messageDiv.textContent = "Cannot connect to server";
 
     }
 
-}
-
-// LOAD DATA
-loadAppointments();
-
+});
 </script>
 
 </body>
-</html>
+</html> 
