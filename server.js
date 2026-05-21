@@ -5,11 +5,11 @@ const mysql = require('mysql2');
 
 const app = express();
 
-// ✅ FIXED PORT FOR VERCEL
+// PORT (Render uses process.env.PORT)
 const PORT = process.env.PORT || 3000;
 
 // ------------------------
-// MYSQL DATABASE CONNECTION
+// MYSQL DATABASE CONNECTION (SAFE)
 // ------------------------
 const db = mysql.createPool({
     host: process.env.DB_HOST,
@@ -21,14 +21,16 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Test connection
-db.query("SELECT 1", (err) => {
-    if (err) console.log("MySQL connection error:", err);
-    else console.log("MySQL pool ready");
-});
+// SAFE TEST (won’t crash deploy)
+if (process.env.DB_HOST) {
+    db.query("SELECT 1", (err) => {
+        if (err) console.log("MySQL connection error:", err.message);
+        else console.log("MySQL pool ready");
+    });
+}
 
 // ------------------------
-// Nodemailer Setup (FIXED)
+// Nodemailer Setup (SAFE)
 // ------------------------
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -38,10 +40,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-transporter.verify(function(error) {
-    if (error) console.log('Email setup error:', error);
-    else console.log('Email transporter ready');
-});
+// SAFE VERIFY (won’t crash deploy)
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    transporter.verify((error) => {
+        if (error) console.log('Email setup error:', error.message);
+        else console.log('Email transporter ready');
+    });
+}
 
 // ------------------------
 // MIDDLEWARE
@@ -74,7 +79,7 @@ app.get('/booking', (req, res) => {
 });
 
 // ------------------------
-// BOOK APPOINTMENT (FIXED EMAIL)
+// BOOK APPOINTMENT (UNCHANGED LOGIC)
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
@@ -84,7 +89,6 @@ app.post('/book-appointment', async (req, res) => {
         return res.json({ message: "Please fill all fields" });
     }
 
-    // STEP 1: DAILY LIMIT
     db.query(
         "SELECT COUNT(*) AS count FROM appointments WHERE date = ?",
         [date],
@@ -98,7 +102,6 @@ app.post('/book-appointment', async (req, res) => {
                 return res.json({ message: "Fully booked for this date." });
             }
 
-            // STEP 2: SLOT LIMIT
             db.query(
                 "SELECT COUNT(*) AS count FROM appointments WHERE date = ? AND time = ?",
                 [date, time],
@@ -114,7 +117,6 @@ app.post('/book-appointment', async (req, res) => {
                         });
                     }
 
-                    // STEP 3: SAVE TO DATABASE
                     const sql = `
                         INSERT INTO appointments
                         (fullname, email, phone, service, date, time)
@@ -131,37 +133,27 @@ app.post('/book-appointment', async (req, res) => {
                                 });
                             }
 
-                            console.log("Appointment saved");
-
-                            // STEP 4: SEND EMAIL (FIXED)
                             const mailOptions = {
                                 from: process.env.EMAIL_USER,
                                 to: email,
-                                subject: 'Christian Medical Clinic Appointment Confirmation',
+                                subject: 'Appointment Confirmation',
                                 html: `
-                                    <h3>Christian Medical Clinic</h3>
-                                    <p>Dear ${fullname},</p>
-                                    <p>Your appointment has been successfully booked.</p>
-
+                                    <h3>Appointment Confirmed</h3>
                                     <p><strong>Service:</strong> ${service}</p>
                                     <p><strong>Date:</strong> ${date}</p>
                                     <p><strong>Time:</strong> ${time}</p>
-
-                                    <p>Thank you for choosing our clinic!</p>
                                 `
                             };
 
                             try {
-                                const info = await transporter.sendMail(mailOptions);
-
-                                console.log("EMAIL SENT:", info.response);
+                                await transporter.sendMail(mailOptions);
 
                                 return res.json({
                                     message: "Appointment booked + email sent!"
                                 });
 
                             } catch (error) {
-                                console.log("EMAIL ERROR:", error);
+                                console.log("EMAIL ERROR:", error.message);
 
                                 return res.json({
                                     message: "Booked but email failed."
@@ -183,7 +175,7 @@ app.get('/appointments', (req, res) => {
     db.query("SELECT * FROM appointments", (err, results) => {
 
         if (err) {
-            return res.status(500).json({ error: err });
+            return res.status(500).json({ error: err.message });
         }
 
         res.json(results);
@@ -216,12 +208,8 @@ app.delete('/delete-appointment/:id', (req, res) => {
 });
 
 // ------------------------
-// VERCEL FIX
+// START SERVER (RENDER REQUIRED)
 // ------------------------
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}
-
-module.exports = app;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
