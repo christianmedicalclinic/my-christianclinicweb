@@ -29,7 +29,7 @@ header{
 }
 
 header h1{
-  font-size:2rem; /* responsive */
+  font-size:2rem;
   margin-bottom:10px;
 }
 
@@ -59,15 +59,14 @@ nav a{
   gap:20px;
 }
 
-/* LEFT SIDE */
 .left{
-  flex:1 1 300px;   /* flexible width */
+  flex:1 1 300px;
   max-width:500px;
   margin-bottom:30px;
 }
 
 .left h2{
-  font-size:2.5rem; /* responsive */
+  font-size:2.5rem;
   color:#0a8f08;
   margin-bottom:20px;
 }
@@ -81,7 +80,6 @@ nav a{
   margin-bottom:20px;
 }
 
-/* RIGHT SIDE */
 .right{
   flex:1 1 300px;
   max-width:500px;
@@ -91,7 +89,6 @@ nav a{
   margin-bottom:30px;
 }
 
-/* FORM */
 input, select{
   width:100%;
   padding:14px;
@@ -101,7 +98,6 @@ input, select{
   font-size:1rem;
 }
 
-/* BUTTON */
 button{
   background:#0a8f08;
   color:white;
@@ -126,7 +122,6 @@ button:hover{
   text-align:center;
 }
 
-/* MOBILE / TABLET RESPONSIVE */
 @media (max-width:900px){
   .container{
     flex-direction: column;
@@ -145,10 +140,6 @@ button:hover{
     gap:10px;
   }
 
-  nav{
-    gap:10px;
-  }
-
   .left h2{
     font-size:2rem;
   }
@@ -162,20 +153,6 @@ button:hover{
     width:100%;
   }
 }
-
-@media (max-width:500px){
-  .left h2{
-    font-size:1.8rem;
-  }
-
-  .info{
-    font-size:0.9rem;
-  }
-
-  header h1{
-    font-size:1.5rem;
-  }
-}
 </style>
 </head>
 
@@ -183,7 +160,7 @@ button:hover{
 
 <header>
 <h1>Christian Medical Clinic</h1>
- 
+
 <nav>
 <li><a href="index.html">Home</a></li>
 <li><a href="services.html">Services</a></li>
@@ -194,7 +171,6 @@ button:hover{
 
 <section class="container">
 
-<!-- LEFT SIDE -->
 <div class="left">
 <h2>Book Appointment</h2>
 <p>Schedule your visit with our medical professionals.</p>
@@ -206,7 +182,6 @@ button:hover{
 </div>
 </div>
 
-<!-- RIGHT SIDE FORM -->
 <div class="right">
 <form id="bookingForm">
 <input type="text" name="fullname" placeholder="Full Name" required>
@@ -230,15 +205,15 @@ button:hover{
 <input type="date" name="date" required>
 
 <select name="time" required>
-    <option value="">Select Time</option>
-    <option value="08:00">8:00 AM</option>
-    <option value="09:00">9:00 AM</option>
-    <option value="10:00">10:00 AM</option>
-    <option value="11:00">11:00 AM</option>
-    <option value="13:00">1:00 PM</option>
-    <option value="14:00">2:00 PM</option>
-    <option value="15:00">3:00 PM</option>
-    <option value="16:00">4:00 PM</option>
+<option value="">Select Time</option>
+<option value="08:00">8:00 AM</option>
+<option value="09:00">9:00 AM</option>
+<option value="10:00">10:00 AM</option>
+<option value="11:00">11:00 AM</option>
+<option value="13:00">1:00 PM</option>
+<option value="14:00">2:00 PM</option>
+<option value="15:00">3:00 PM</option>
+<option value="16:00">4:00 PM</option>
 </select>
 
 <button type="submit">Book Appointment</button>
@@ -248,31 +223,40 @@ button:hover{
 
 </section>
 
+<!-- ✅ FIXED SCRIPT -->
 <script>
 const form = document.getElementById('bookingForm');
 const messageDiv = document.getElementById('message');
 
-form.addEventListener('submit', function(e) {
+form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     let formData = new FormData(form);
     let data = Object.fromEntries(formData.entries());
 
-    // Get existing bookings
-    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    try {
+        const response = await fetch('/book-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-    // Add new booking
-    bookings.push(data);
+        const result = await response.json();
 
-    // Save to localStorage
-    localStorage.setItem("bookings", JSON.stringify(bookings));
+        messageDiv.textContent = result.message;
 
-    // Show success message
-    messageDiv.textContent = "Appointment booked successfully!";
+        if (response.ok) {
+            form.reset();
+        }
 
-    // Clear form
-    form.reset();
+    } catch (error) {
+        console.log(error);
+        messageDiv.textContent = "Error booking appointment.";
+    }
 });
 </script>
+
 </body>
 </html>
