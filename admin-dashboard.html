@@ -7,316 +7,520 @@
 
 <style>
 body {
-background: #f4fefe;
-font-family: "Segoe UI", Tahoma, sans-serif;
-margin: 0;
-padding: 0;
+  background: #f4fefe;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 header {
-background: #00861d;
-color: #fff;
-padding: 20px 0;
+  background: #00861d;
+  color: #fff;
+  padding: 20px 0;
 }
 
 header .container {
-display: flex;
-justify-content: space-between;
-align-items: center;
-max-width: 1100px;
-margin: 0 auto;
-padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 header a {
-color: #fff;
-text-decoration: none;
+  color: #fff;
+  text-decoration: none;
 }
 
 section.container {
-max-width: 900px;
-margin: 40px auto;
-padding: 0 20px;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 h3 {
-color: #117b0b;
-margin-bottom: 20px;
+  color: #117b0b;
+  margin-bottom: 20px;
 }
 
 .date-section {
-margin-bottom: 20px;
-border: 1px solid #ccc;
-border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 .date-header {
-background: #0a8f08;
-color: white;
-padding: 10px 15px;
-cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-weight: bold;
-border-radius: 8px 8px 0 0;
+  background: #0a8f08;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
 }
 
 .date-content {
-padding: 10px 15px;
+  padding: 10px 15px;
 }
 
 .msg-box {
-background: #fff;
-padding: 10px;
-margin-bottom: 10px;
-border-radius: 8px;
-box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  background: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
 
 .delete-btn {
-margin-top: 5px;
-background: #dc3545;
-color: #fff;
-border: none;
-padding: 5px 10px;
-border-radius: 5px;
-cursor: pointer;
-font-size: 13px;
+  margin-top: 5px;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
 }
 
 .delete-btn:hover {
-background: #b52a37;
+  background: #b52a37;
 }
 
 .date-counter {
-font-weight: bold;
+  font-weight: bold;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #0a8f08;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 10px 22px;
+  background: #e8f5e9;
+  color: #117b0b;
+  border: 1px solid #0a8f08;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn:hover {
+  background: #c8e6c9;
+}
+
+.tab-btn.active {
+  background: #0a8f08;
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
 }
 
 /* SEARCH BAR */
 .search-bar {
-display: flex;
-gap: 10px;
-align-items: center;
-margin-bottom: 20px;
-flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.search-bar input[type="date"] {
-padding: 10px;
-border: 1px solid #ccc;
-border-radius: 8px;
-font-size: 1rem;
+.search-bar input[type="date"],
+.search-bar input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 .search-bar button {
-padding: 10px 20px;
-background: #0a8f08;
-color: white;
-border: none;
-border-radius: 8px;
-font-size: 1rem;
-cursor: pointer;
+  padding: 10px 20px;
+  background: #0a8f08;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 .search-bar button:hover {
-background: #066606;
+  background: #066606;
 }
 
 .search-bar .clear-btn {
-background: #6c757d;
+  background: #6c757d;
 }
 
 .search-bar .clear-btn:hover {
-background: #545b62;
+  background: #545b62;
 }
 
 /* SERVICE FOLDER */
 .service-folder {
-margin-bottom: 15px;
-border: 1px solid #ddd;
-border-radius: 6px;
-background: #f9f9f9;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
 }
 
 .service-header {
-background: #117b0b;
-color: white;
-padding: 8px 12px;
-cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-weight: bold;
-border-radius: 6px 6px 0 0;
+  background: #117b0b;
+  color: white;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 6px 6px 0 0;
 }
 
 .service-header:hover {
-background: #0e6a09;
+  background: #0e6a09;
 }
 
 .service-content {
-padding: 10px;
+  padding: 10px;
 }
 
 /* STATUS FOLDER */
 .status-folder {
-margin-bottom: 10px;
-border: 1px solid #e0e0e0;
-border-radius: 6px;
-overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .status-header {
-padding: 8px 12px;
-cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-weight: bold;
-font-size: 0.9rem;
-user-select: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  user-select: none;
 }
 
 .status-header.new {
-background: #1a6fb5;
-color: white;
+  background: #1a6fb5;
+  color: white;
 }
 
 .status-header.new:hover {
-background: #155fa0;
+  background: #155fa0;
 }
 
 .status-header.confirmed {
-background: #198754;
-color: white;
+  background: #198754;
+  color: white;
 }
 
 .status-header.confirmed:hover {
-background: #146e44;
+  background: #146e44;
 }
 
 .status-header.cancelled {
-background: #b52a37;
-color: white;
+  background: #b52a37;
+  color: white;
 }
 
 .status-header.cancelled:hover {
-background: #9b2130;
+  background: #9b2130;
 }
 
 .status-content {
-padding: 10px;
-background: #fff;
+  padding: 10px;
+  background: #fff;
 }
 
 /* TIME FOLDER */
 .time-folder {
-margin-bottom: 10px;
-border: 1px solid #e0e0e0;
-border-radius: 5px;
-background: #fff;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background: #fff;
 }
 
 .time-header {
-background: #28a745;
-color: white;
-padding: 6px 10px;
-cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-weight: bold;
-border-radius: 5px 5px 0 0;
-font-size: 0.95rem;
+  background: #28a745;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 5px 5px 0 0;
+  font-size: 0.95rem;
 }
 
 .time-header:hover {
-background: #218838;
+  background: #218838;
 }
 
 .time-content {
-padding: 8px;
+  padding: 8px;
 }
 
 .folder-icon {
-margin-right: 8px;
+  margin-right: 8px;
 }
 
 /* STATUS BADGE */
 .status-badge {
-display: inline-block;
-font-size: 11px;
-padding: 2px 8px;
-border-radius: 20px;
-font-weight: bold;
-margin-bottom: 6px;
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-bottom: 6px;
 }
 
 .status-badge.new {
-background: #cce5ff;
-color: #004085;
+  background: #cce5ff;
+  color: #004085;
 }
 
 .status-badge.confirmed {
-background: #d4edda;
-color: #155724;
+  background: #d4edda;
+  color: #155724;
 }
 
 .status-badge.cancelled {
-background: #f8d7da;
-color: #721c24;
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.completed {
+  background: #d0f0e8;
+  color: #0a5c44;
 }
 
 /* BOOKED ON BADGE */
 .booked-on {
-display: inline-block;
-font-size: 11px;
-padding: 2px 8px;
-border-radius: 20px;
-font-weight: bold;
-margin-bottom: 6px;
-margin-left: 6px;
-background: #fff3cd;
-color: #856404;
-border: 1px solid #ffc107;
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  margin-left: 6px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
 }
 
 /* ACTION BUTTONS */
 .action-btns {
-display: flex;
-gap: 6px;
-margin-top: 8px;
-flex-wrap: wrap;
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
 }
 
 .confirm-btn {
-background: #198754;
-color: #fff;
-border: none;
-padding: 5px 12px;
-border-radius: 5px;
-cursor: pointer;
-font-size: 13px;
-font-weight: bold;
+  background: #198754;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 .confirm-btn:hover {
-background: #146e44;
+  background: #146e44;
 }
 
 .cancel-appt-btn {
-background: #6c757d;
-color: #fff;
-border: none;
-padding: 5px 12px;
-border-radius: 5px;
-cursor: pointer;
-font-size: 13px;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
 }
 
 .cancel-appt-btn:hover {
-background: #545b62;
+  background: #545b62;
+}
+
+/* COMPLETED BUTTON */
+.complete-btn {
+  background: #0a7c5c;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.complete-btn:hover {
+  background: #085e45;
+}
+
+/* COMPLETED TAB STYLES */
+.completed-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px 24px;
+  min-width: 150px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  text-align: center;
+}
+
+.summary-card .count {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #0a7c5c;
+}
+
+.summary-card .label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* COMPLETED FOLDER */
+.completed-service-folder {
+  margin-bottom: 15px;
+  border: 1px solid #a8d5c2;
+  border-radius: 8px;
+  background: #f0faf5;
+}
+
+.completed-service-header {
+  background: #0a7c5c;
+  color: white;
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.95rem;
+}
+
+.completed-service-header:hover {
+  background: #085e45;
+}
+
+.completed-service-content {
+  padding: 10px;
+}
+
+.completed-date-folder {
+  margin-bottom: 10px;
+  border: 1px solid #c3e6d8;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.completed-date-header {
+  background: #17a372;
+  color: white;
+  padding: 7px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 6px 6px 0 0;
+  font-size: 0.9rem;
+}
+
+.completed-date-header:hover {
+  background: #128a5f;
+}
+
+.completed-date-content {
+  padding: 8px;
+}
+
+.completed-row {
+  background: #fff;
+  border: 1px solid #c3e6d8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.completed-row .info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.completed-row .info p {
+  margin: 3px 0;
+  font-size: 0.88rem;
+  color: #333;
+}
+
+.completed-badge {
+  background: #d0f0e8;
+  color: #0a5c44;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  border: 1px solid #a8d5c2;
+}
+
+.no-completed {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+  font-size: 1rem;
+}
+
+.no-completed .icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+/* MESSAGES */
+.msg-box-msg {
+  background: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
 </style>
 </head>
@@ -324,413 +528,650 @@ background: #545b62;
 <body>
 
 <header>
-<div class="container">
-<h2>Admin Dashboard</h2>
-<a href="index.html">Logout</a>
-</div>
+  <div class="container">
+    <h2>Admin Dashboard</h2>
+    <a href="index.html">Logout</a>
+  </div>
 </header>
 
 <section class="container">
 
-<h3>Patient Messages</h3>
-<div id="messages"></div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('appointments-tab', this)">📅 Booked Appointments</button>
+    <button class="tab-btn" onclick="switchTab('completed-tab', this)">✅ Completed Services</button>
+    <button class="tab-btn" onclick="switchTab('messages-tab', this)">💬 Patient Messages</button>
+  </div>
 
-<h3>Booked Appointments</h3>
+  <!-- TAB: BOOKED APPOINTMENTS -->
+  <div id="appointments-tab" class="tab-panel active">
 
-<!-- SEARCH BAR -->
-<div class="search-bar">
-<input type="date" id="searchDate">
-<button onclick="searchDate()">🔍 Find</button>
-<button class="clear-btn" onclick="clearSearch()">✖ Clear</button>
-</div>
+    <h3>Booked Appointments</h3>
 
-<div id="appointments"></div>
+    <!-- SEARCH BAR -->
+    <div class="search-bar">
+      <input type="date" id="searchDate">
+      <button onclick="searchDate()">🔍 Find</button>
+      <button class="clear-btn" onclick="clearSearch()">✖ Clear</button>
+    </div>
+
+    <div id="appointments"></div>
+
+  </div>
+
+  <!-- TAB: COMPLETED SERVICES -->
+  <div id="completed-tab" class="tab-panel">
+
+    <h3>Completed Services</h3>
+
+    <!-- SUMMARY CARDS -->
+    <div class="completed-summary" id="completed-summary"></div>
+
+    <!-- SEARCH FOR COMPLETED -->
+    <div class="search-bar">
+      <input type="text" id="completedSearch" placeholder="Search by name or service..." oninput="filterCompleted()">
+      <button class="clear-btn" onclick="clearCompletedSearch()">✖ Clear</button>
+    </div>
+
+    <div id="completed-list"></div>
+
+  </div>
+
+  <!-- TAB: MESSAGES -->
+  <div id="messages-tab" class="tab-panel">
+
+    <h3>Patient Messages</h3>
+    <div id="messages"></div>
+
+  </div>
 
 </section>
 
 <script>
 
 /* =========================
-CONTACT MESSAGES
+   TAB SWITCHING
 ========================= */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
 
-let messages = JSON.parse(localStorage.getItem("messages")) || [];
-let messagesContainer = document.getElementById("messages");
+  if (tabId === 'completed-tab') loadCompleted();
+  if (tabId === 'messages-tab') loadMessages();
+}
 
-if (messages.length === 0) {
-messagesContainer.innerHTML = "<p>No messages yet.</p>";
-} else {
-messages.forEach((msg, index) => {
-messagesContainer.innerHTML += `
-<div class="msg-box">
-<p><strong>Name:</strong> ${msg.name}</p>
-<p><strong>Email:</strong> ${msg.email}</p>
-<p>${msg.message}</p>
-<button class="delete-btn" onclick="deleteMessage(${index})">Delete</button>
-</div>
-`;
-});
+/* =========================
+   CONTACT MESSAGES
+========================= */
+function loadMessages() {
+  let messages = JSON.parse(localStorage.getItem("messages")) || [];
+  let messagesContainer = document.getElementById("messages");
+
+  if (messages.length === 0) {
+    messagesContainer.innerHTML = "<p>No messages yet.</p>";
+    return;
+  }
+
+  messagesContainer.innerHTML = "";
+  messages.forEach((msg, index) => {
+    messagesContainer.innerHTML += `
+      <div class="msg-box-msg">
+        <p><strong>Name:</strong> ${msg.name}</p>
+        <p><strong>Email:</strong> ${msg.email}</p>
+        <p>${msg.message}</p>
+        <button class="delete-btn" onclick="deleteMessage(${index})">Delete</button>
+      </div>
+    `;
+  });
 }
 
 function deleteMessage(index) {
-let messages = JSON.parse(localStorage.getItem("messages")) || [];
-if (confirm("Delete this message?")) {
-messages.splice(index, 1);
-localStorage.setItem("messages", JSON.stringify(messages));
-location.reload();
-}
+  let messages = JSON.parse(localStorage.getItem("messages")) || [];
+  if (confirm("Delete this message?")) {
+    messages.splice(index, 1);
+    localStorage.setItem("messages", JSON.stringify(messages));
+    loadMessages();
+  }
 }
 
 
 /* =========================
-APPOINTMENTS
+   APPOINTMENTS
 ========================= */
 
 let allAppointments = [];
 
 function formatDate(rawDate) {
-const d = new Date(rawDate);
-return d.toLocaleDateString('en-PH', {
-year: 'numeric',
-month: 'long',
-day: 'numeric',
-timeZone: 'Asia/Manila'
-});
+  const d = new Date(rawDate);
+  return d.toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'Asia/Manila'
+  });
 }
 
 function formatTime(rawTime) {
-const [hour, minute] = rawTime.split(':');
-const h = parseInt(hour);
-const ampm = h >= 12 ? 'PM' : 'AM';
-const h12 = h % 12 || 12;
-return `${h12}:${minute} ${ampm}`;
+  const [hour, minute] = rawTime.split(':');
+  const h = parseInt(hour);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return ${h12}:${minute} ${ampm};
 }
 
-// FORMAT THE created_at TIMESTAMP
 function formatBookedOn(raw) {
-if (!raw) return 'N/A';
-const d = new Date(raw);
-return d.toLocaleString('en-PH', {
-year: 'numeric',
-month: 'long',
-day: 'numeric',
-hour: 'numeric',
-minute: '2-digit',
-hour12: true,
-timeZone: 'Asia/Manila'
-});
+  if (!raw) return 'N/A';
+  const d = new Date(raw);
+  return d.toLocaleString('en-PH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Manila'
+  });
 }
 
 function searchDate() {
-const selected = document.getElementById("searchDate").value;
-if (!selected) {
-alert("Please pick a date first.");
-return;
-}
-renderAppointments(allAppointments, selected);
+  const selected = document.getElementById("searchDate").value;
+  if (!selected) {
+    alert("Please pick a date first.");
+    return;
+  }
+  renderAppointments(allAppointments, selected);
 }
 
 function clearSearch() {
-document.getElementById("searchDate").value = "";
-renderAppointments(allAppointments, null);
+  document.getElementById("searchDate").value = "";
+  renderAppointments(allAppointments, null);
 }
 
 async function confirmAppointment(id) {
-if (!confirm("Confirm this appointment?")) return;
-try {
-const response = await fetch(`/update-appointment/${id}`, {
-method: 'PATCH',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ status: 'confirmed' })
-});
-const result = await response.json();
-alert(result.message || "Appointment confirmed.");
-loadAppointments();
-} catch (error) {
-console.log(error);
-}
+  if (!confirm("Confirm this appointment?")) return;
+  try {
+    const response = await fetch(/update-appointment/${id}, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'confirmed' })
+    });
+    const result = await response.json();
+    alert(result.message || "Appointment confirmed.");
+    loadAppointments();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function cancelAppointment(id) {
-if (!confirm("Cancel this appointment?")) return;
-try {
-const response = await fetch(`/update-appointment/${id}`, {
-method: 'PATCH',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ status: 'cancelled' })
-});
-const result = await response.json();
-alert(result.message || "Appointment cancelled.");
-loadAppointments();
-} catch (error) {
-console.log(error);
+  if (!confirm("Cancel this appointment?")) return;
+  try {
+    const response = await fetch(/update-appointment/${id}, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'cancelled' })
+    });
+    const result = await response.json();
+    alert(result.message || "Appointment cancelled.");
+    loadAppointments();
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+async function completeAppointment(id) {
+  if (!confirm("Mark this appointment as completed? It will be moved to the Completed Services folder.")) return;
+  try {
+    const response = await fetch(/update-appointment/${id}, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'completed' })
+    });
+    const result = await response.json();
+    alert(result.message || "Appointment marked as completed.");
+    loadAppointments();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function renderAppointments(appointments, filterDate) {
 
-let container = document.getElementById("appointments");
+  let container = document.getElementById("appointments");
 
-if (appointments.length === 0) {
-container.innerHTML = "<p>No appointments yet.</p>";
-return;
-}
+  // Exclude completed from this view
+  const activeAppointments = appointments.filter(a => (a.status || 'new') !== 'completed');
 
-container.innerHTML = "";
+  if (activeAppointments.length === 0) {
+    container.innerHTML = "<p>No appointments yet.</p>";
+    return;
+  }
 
-let groupedByDate = {};
+  container.innerHTML = "";
 
-appointments.forEach(app => {
-const date = app.appointment_date;
-if (!groupedByDate[date]) groupedByDate[date] = [];
-groupedByDate[date].push(app);
-});
+  let groupedByDate = {};
 
-let dates = Object.keys(groupedByDate).sort();
+  activeAppointments.forEach(app => {
+    const date = app.appointment_date;
+    if (!groupedByDate[date]) groupedByDate[date] = [];
+    groupedByDate[date].push(app);
+  });
 
-// FILTER IF DATE SELECTED
-if (filterDate) {
-dates = dates.filter(date => {
-const d = new Date(date);
-const local = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
-return local === filterDate;
-});
+  let dates = Object.keys(groupedByDate).sort();
 
-if (dates.length === 0) {
-container.innerHTML = "<p>No appointments found for this date.</p>";
-return;
-}
-}
+  if (filterDate) {
+    dates = dates.filter(date => {
+      const d = new Date(date);
+      const local = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+      return local === filterDate;
+    });
 
-dates.forEach(date => {
+    if (dates.length === 0) {
+      container.innerHTML = "<p>No appointments found for this date.</p>";
+      return;
+    }
+  }
 
-let section = document.createElement("div");
-section.className = "date-section";
+  dates.forEach(date => {
 
-let header = document.createElement("div");
-header.className = "date-header";
-header.innerHTML = `
-<span>📅 Date: ${formatDate(date)}</span>
-<span class="date-counter">${groupedByDate[date].length} / 100</span>
-`;
+    let section = document.createElement("div");
+    section.className = "date-section";
 
-section.appendChild(header);
+    let header = document.createElement("div");
+    header.className = "date-header";
+    header.innerHTML = `
+      <span>📅 Date: ${formatDate(date)}</span>
+      <span class="date-counter">${groupedByDate[date].length} / 100</span>
+    `;
 
-// DELETE ALL BUTTON
-let deleteAllBtn = document.createElement("button");
-deleteAllBtn.className = "delete-btn";
-deleteAllBtn.textContent = "Delete All";
-deleteAllBtn.style.marginLeft = "10px";
-deleteAllBtn.onclick = async function(e) {
-e.stopPropagation();
-if (confirm("Delete all appointments for this date?")) {
-try {
-for (const app of groupedByDate[date]) {
-await fetch(`/delete-appointment/${app.id}`, { method: 'DELETE' });
-}
-loadAppointments();
-} catch (error) {
-console.log(error);
-}
-}
-};
-header.appendChild(deleteAllBtn);
+    section.appendChild(header);
 
-let content = document.createElement("div");
-content.className = "date-content";
+    // DELETE ALL BUTTON
+    let deleteAllBtn = document.createElement("button");
+    deleteAllBtn.className = "delete-btn";
+    deleteAllBtn.textContent = "Delete All";
+    deleteAllBtn.style.marginLeft = "10px";
+    deleteAllBtn.onclick = async function(e) {
+      e.stopPropagation();
+      if (confirm("Delete all appointments for this date?")) {
+        try {
+          for (const app of groupedByDate[date]) {
+            await fetch(/delete-appointment/${app.id}, { method: 'DELETE' });
+          }
+          loadAppointments();
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    header.appendChild(deleteAllBtn);
 
-// GROUP BY SERVICE
-let groupedByService = {};
-groupedByDate[date].forEach(app => {
-const serviceName = app.service || "Unknown Service";
-if (!groupedByService[serviceName]) groupedByService[serviceName] = [];
-groupedByService[serviceName].push(app);
-});
+    let content = document.createElement("div");
+    content.className = "date-content";
 
-// LOOP THROUGH SERVICES
-Object.keys(groupedByService).sort().forEach(service => {
+    // GROUP BY SERVICE
+    let groupedByService = {};
+    groupedByDate[date].forEach(app => {
+      const serviceName = app.service || "Unknown Service";
+      if (!groupedByService[serviceName]) groupedByService[serviceName] = [];
+      groupedByService[serviceName].push(app);
+    });
 
-let serviceFolder = document.createElement("div");
-serviceFolder.className = "service-folder";
+    // LOOP THROUGH SERVICES
+    Object.keys(groupedByService).sort().forEach(service => {
 
-let serviceHeader = document.createElement("div");
-serviceHeader.className = "service-header";
-serviceHeader.innerHTML = `
-<span><span class="folder-icon">📁</span>${service}</span>
-<span>${groupedByService[service].length} appointment(s)</span>
-`;
-serviceFolder.appendChild(serviceHeader);
+      let serviceFolder = document.createElement("div");
+      serviceFolder.className = "service-folder";
 
-let serviceContent = document.createElement("div");
-serviceContent.className = "service-content";
+      let serviceHeader = document.createElement("div");
+      serviceHeader.className = "service-header";
+      serviceHeader.innerHTML = `
+        <span><span class="folder-icon">📁</span>${service}</span>
+        <span>${groupedByService[service].length} appointment(s)</span>
+      `;
+      serviceFolder.appendChild(serviceHeader);
 
-// STATUS SUB-FOLDERS: new, confirmed, cancelled
-const statusList = [
-{ key: 'new', label: '🆕 New Appointments', icon: '🆕' },
-{ key: 'confirmed', label: '✅ Confirmed Appointments', icon: '✅' },
-{ key: 'cancelled', label: '❌ Cancelled Appointments', icon: '❌' }
-];
+      let serviceContent = document.createElement("div");
+      serviceContent.className = "service-content";
 
-statusList.forEach(({ key, label }) => {
+      // STATUS SUB-FOLDERS: new, confirmed, cancelled
+      const statusList = [
+        { key: 'new',       label: '🆕 New Appointments' },
+        { key: 'confirmed', label: '✅ Confirmed Appointments' },
+        { key: 'cancelled', label: '❌ Cancelled Appointments' }
+      ];
 
-const statusAppts = groupedByService[service].filter(a => (a.status || 'new') === key);
+      statusList.forEach(({ key, label }) => {
 
-let statusFolder = document.createElement("div");
-statusFolder.className = "status-folder";
+        const statusAppts = groupedByService[service].filter(a => (a.status || 'new') === key);
 
-let statusHeader = document.createElement("div");
-statusHeader.className = `status-header ${key}`;
-statusHeader.innerHTML = `
-<span>${label}</span>
-<span>${statusAppts.length} appointment(s)</span>
-`;
-statusFolder.appendChild(statusHeader);
+        let statusFolder = document.createElement("div");
+        statusFolder.className = "status-folder";
 
-let statusContent = document.createElement("div");
-statusContent.className = "status-content";
+        let statusHeader = document.createElement("div");
+        statusHeader.className = status-header ${key};
+        statusHeader.innerHTML = `
+          <span>${label}</span>
+          <span>${statusAppts.length} appointment(s)</span>
+        `;
+        statusFolder.appendChild(statusHeader);
 
-if (statusAppts.length === 0) {
-statusContent.innerHTML = `<p style="color:#888;font-size:13px;">No ${key} appointments.</p>`;
-} else {
+        let statusContent = document.createElement("div");
+        statusContent.className = "status-content";
 
-// GROUP BY TIME WITHIN STATUS
-let groupedByTime = {};
-statusAppts.forEach(app => {
-if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
-groupedByTime[app.time].push(app);
-});
+        if (statusAppts.length === 0) {
+          statusContent.innerHTML = <p style="color:#888;font-size:13px;">No ${key} appointments.</p>;
+        } else {
 
-// LOOP THROUGH TIME SLOTS
-Object.keys(groupedByTime).sort().forEach(time => {
+          // GROUP BY TIME WITHIN STATUS
+          let groupedByTime = {};
+          statusAppts.forEach(app => {
+            if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
+            groupedByTime[app.time].push(app);
+          });
 
-let timeFolder = document.createElement("div");
-timeFolder.className = "time-folder";
+          Object.keys(groupedByTime).sort().forEach(time => {
 
-let timeHeader = document.createElement("div");
-timeHeader.className = "time-header";
-timeHeader.innerHTML = `
-<span><span class="folder-icon">🕐</span>${formatTime(time)}</span>
-<span>${groupedByTime[time].length} / 12 booked</span>
-`;
-timeFolder.appendChild(timeHeader);
+            let timeFolder = document.createElement("div");
+            timeFolder.className = "time-folder";
 
-let timeContent = document.createElement("div");
-timeContent.className = "time-content";
+            let timeHeader = document.createElement("div");
+            timeHeader.className = "time-header";
+            timeHeader.innerHTML = `
+              <span><span class="folder-icon">🕐</span>${formatTime(time)}</span>
+              <span>${groupedByTime[time].length} / 12 booked</span>
+            `;
+            timeFolder.appendChild(timeHeader);
 
-// INDIVIDUAL APPOINTMENTS
-groupedByTime[time].forEach(app => {
-let div = document.createElement("div");
-div.className = "msg-box";
+            let timeContent = document.createElement("div");
+            timeContent.className = "time-content";
 
-const appStatus = app.status || 'new';
+            groupedByTime[time].forEach(app => {
+              let div = document.createElement("div");
+              div.className = "msg-box";
 
-div.innerHTML = `
-<span class="status-badge ${appStatus}">${appStatus.charAt(0).toUpperCase() + appStatus.slice(1)}</span>
-<span class="booked-on">📋 Booked on: ${formatBookedOn(app.created_at)}</span>
-<p><strong>Name:</strong> ${app.fullname}</p>
-<p><strong>Email:</strong> ${app.email}</p>
-<p><strong>Phone:</strong> ${app.phone}</p>
-<p><strong>Service:</strong> ${app.service || 'N/A'}</p>
-`;
+              const appStatus = app.status || 'new';
 
-let actionRow = document.createElement("div");
-actionRow.className = "action-btns";
+              div.innerHTML = `
+                <span class="status-badge ${appStatus}">${appStatus.charAt(0).toUpperCase() + appStatus.slice(1)}</span>
+                <span class="booked-on">📋 Booked on: ${formatBookedOn(app.created_at)}</span>
+                <p><strong>Name:</strong> ${app.fullname}</p>
+                <p><strong>Email:</strong> ${app.email}</p>
+                <p><strong>Phone:</strong> ${app.phone}</p>
+                <p><strong>Service:</strong> ${app.service || 'N/A'}</p>
+              `;
 
-// CONFIRM & CANCEL BUTTONS — only for new appointments
-if (appStatus === 'new') {
-let confirmBtn = document.createElement("button");
-confirmBtn.className = "confirm-btn";
-confirmBtn.textContent = "✔ Confirm";
-confirmBtn.onclick = () => confirmAppointment(app.id);
-actionRow.appendChild(confirmBtn);
+              let actionRow = document.createElement("div");
+              actionRow.className = "action-btns";
 
-let cancelBtn = document.createElement("button");
-cancelBtn.className = "cancel-appt-btn";
-cancelBtn.textContent = "✖ Cancel";
-cancelBtn.onclick = () => cancelAppointment(app.id);
-actionRow.appendChild(cancelBtn);
-}
+              // NEW: show Confirm + Cancel
+              if (appStatus === 'new') {
+                let confirmBtn = document.createElement("button");
+                confirmBtn.className = "confirm-btn";
+                confirmBtn.textContent = "✔ Confirm";
+                confirmBtn.onclick = () => confirmAppointment(app.id);
+                actionRow.appendChild(confirmBtn);
 
-let deleteBtn = document.createElement("button");
-deleteBtn.className = "delete-btn";
-deleteBtn.textContent = "Delete";
-deleteBtn.onclick = () => deleteAppointment(app.id);
-actionRow.appendChild(deleteBtn);
+                let cancelBtn = document.createElement("button");
+                cancelBtn.className = "cancel-appt-btn";
+                cancelBtn.textContent = "✖ Cancel";
+                cancelBtn.onclick = () => cancelAppointment(app.id);
+                actionRow.appendChild(cancelBtn);
+              }
 
-div.appendChild(actionRow);
-timeContent.appendChild(div);
-});
+              // CONFIRMED: show Completed button
+              if (appStatus === 'confirmed') {
+                let completeBtn = document.createElement("button");
+                completeBtn.className = "complete-btn";
+                completeBtn.textContent = "✔ Completed";
+                completeBtn.onclick = () => completeAppointment(app.id);
+                actionRow.appendChild(completeBtn);
+              }
 
-timeFolder.appendChild(timeContent);
-statusContent.appendChild(timeFolder);
+              // ALL: Delete button
+              let deleteBtn = document.createElement("button");
+              deleteBtn.className = "delete-btn";
+              deleteBtn.textContent = "Delete";
+              deleteBtn.onclick = () => deleteAppointment(app.id);
+              actionRow.appendChild(deleteBtn);
 
-// TOGGLE TIME FOLDER
-timeHeader.addEventListener("click", (e) => {
-e.stopPropagation();
-timeContent.style.display = timeContent.style.display === "none" ? "block" : "none";
-});
-});
-}
+              div.appendChild(actionRow);
+              timeContent.appendChild(div);
+            });
 
-statusFolder.appendChild(statusContent);
-serviceContent.appendChild(statusFolder);
+            timeFolder.appendChild(timeContent);
+            statusContent.appendChild(timeFolder);
 
-// TOGGLE STATUS FOLDER
-statusHeader.addEventListener("click", (e) => {
-e.stopPropagation();
-statusContent.style.display = statusContent.style.display === "none" ? "block" : "none";
-});
+            timeHeader.addEventListener("click", (e) => {
+              e.stopPropagation();
+              timeContent.style.display = timeContent.style.display === "none" ? "block" : "none";
+            });
+          });
+        }
 
-});
+        statusFolder.appendChild(statusContent);
+        serviceContent.appendChild(statusFolder);
 
-serviceFolder.appendChild(serviceContent);
-content.appendChild(serviceFolder);
+        statusHeader.addEventListener("click", (e) => {
+          e.stopPropagation();
+          statusContent.style.display = statusContent.style.display === "none" ? "block" : "none";
+        });
 
-// TOGGLE SERVICE FOLDER
-serviceHeader.addEventListener("click", (e) => {
-e.stopPropagation();
-serviceContent.style.display = serviceContent.style.display === "none" ? "block" : "none";
-});
+      });
 
-});
+      serviceFolder.appendChild(serviceContent);
+      content.appendChild(serviceFolder);
 
-section.appendChild(content);
-container.appendChild(section);
+      serviceHeader.addEventListener("click", (e) => {
+        e.stopPropagation();
+        serviceContent.style.display = serviceContent.style.display === "none" ? "block" : "none";
+      });
 
-header.addEventListener("click", () => {
-content.style.display = content.style.display === "none" ? "block" : "none";
-});
+    });
 
-});
+    section.appendChild(content);
+    container.appendChild(section);
 
+    header.addEventListener("click", () => {
+      content.style.display = content.style.display === "none" ? "block" : "none";
+    });
+
+  });
 }
 
 async function loadAppointments() {
-let container = document.getElementById("appointments");
-try {
-const response = await fetch('/appointments');
-allAppointments = await response.json();
-const filterDate = document.getElementById("searchDate").value || null;
-renderAppointments(allAppointments, filterDate);
-} catch (error) {
-console.log("FETCH ERROR:", error);
-container.innerHTML = "<p>Failed to load appointments.</p>";
-}
+  let container = document.getElementById("appointments");
+  try {
+    const response = await fetch('/appointments');
+    allAppointments = await response.json();
+    const filterDate = document.getElementById("searchDate").value || null;
+    renderAppointments(allAppointments, filterDate);
+  } catch (error) {
+    console.log("FETCH ERROR:", error);
+    container.innerHTML = "<p>Failed to load appointments.</p>";
+  }
 }
 
 async function deleteAppointment(id) {
-if (confirm("Delete this appointment?")) {
-try {
-const response = await fetch(`/delete-appointment/${id}`, { method: 'DELETE' });
-const result = await response.json();
-alert(result.message);
-loadAppointments();
-} catch(error) {
-console.log(error);
-}
-}
+  if (confirm("Delete this appointment?")) {
+    try {
+      const response = await fetch(/delete-appointment/${id}, { method: 'DELETE' });
+      const result = await response.json();
+      alert(result.message);
+      loadAppointments();
+    } catch(error) {
+      console.log(error);
+    }
+  }
 }
 
+
+/* =========================
+   COMPLETED SERVICES
+========================= */
+
+let allCompleted = [];
+
+async function loadCompleted() {
+  const listEl = document.getElementById("completed-list");
+  const summaryEl = document.getElementById("completed-summary");
+  listEl.innerHTML = "<p style='color:#888;'>Loading...</p>";
+
+  try {
+    const response = await fetch('/completed-appointments');
+    allCompleted = await response.json();
+    renderCompleted(allCompleted);
+  } catch (error) {
+    console.log("FETCH ERROR:", error);
+    listEl.innerHTML = "<p>Failed to load completed appointments.</p>";
+  }
+}
+
+function filterCompleted() {
+  const q = document.getElementById("completedSearch").value.toLowerCase();
+  if (!q) {
+    renderCompleted(allCompleted);
+    return;
+  }
+  const filtered = allCompleted.filter(a =>
+    a.fullname.toLowerCase().includes(q) ||
+    (a.service || '').toLowerCase().includes(q)
+  );
+  renderCompleted(filtered);
+}
+
+function clearCompletedSearch() {
+  document.getElementById("completedSearch").value = "";
+  renderCompleted(allCompleted);
+}
+
+function renderCompleted(data) {
+  const listEl = document.getElementById("completed-list");
+  const summaryEl = document.getElementById("completed-summary");
+
+  // SUMMARY CARDS
+  const totalCount = data.length;
+  const serviceMap = {};
+  data.forEach(a => {
+    const s = a.service || 'Unknown';
+    serviceMap[s] = (serviceMap[s] || 0) + 1;
+  });
+  const uniqueServices = Object.keys(serviceMap).length;
+
+  summaryEl.innerHTML = `
+    <div class="summary-card">
+      <div class="count">${totalCount}</div>
+      <div class="label">Total Completed</div>
+    </div>
+    <div class="summary-card">
+      <div class="count">${uniqueServices}</div>
+      <div class="label">Service Types</div>
+    </div>
+  `;
+
+  if (data.length === 0) {
+    listEl.innerHTML = `
+      <div class="no-completed">
+        <div class="icon">📂</div>
+        <p>No completed appointments yet.</p>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = "";
+
+  // GROUP BY SERVICE
+  const groupedByService = {};
+  data.forEach(app => {
+    const s = app.service || 'Unknown Service';
+    if (!groupedByService[s]) groupedByService[s] = [];
+    groupedByService[s].push(app);
+  });
+
+  // SORT SERVICES ALPHABETICALLY
+  Object.keys(groupedByService).sort().forEach(service => {
+
+    const appts = groupedByService[service];
+
+    let folder = document.createElement("div");
+    folder.className = "completed-service-folder";
+
+    let fHeader = document.createElement("div");
+    fHeader.className = "completed-service-header";
+    fHeader.innerHTML = `
+      <span>📁 ${service}</span>
+      <span>${appts.length} completed</span>
+    `;
+    folder.appendChild(fHeader);
+
+    let fContent = document.createElement("div");
+    fContent.className = "completed-service-content";
+    fContent.style.display = "block";
+
+    // GROUP BY DATE WITHIN SERVICE
+    const groupedByDate = {};
+    appts.forEach(app => {
+      const d = app.appointment_date;
+      if (!groupedByDate[d]) groupedByDate[d] = [];
+      groupedByDate[d].push(app);
+    });
+
+    // SORT DATES DESCENDING (most recent first)
+    Object.keys(groupedByDate).sort().reverse().forEach(date => {
+
+      const dateAppts = groupedByDate[date];
+
+      let dateFolder = document.createElement("div");
+      dateFolder.className = "completed-date-folder";
+
+      let dateHeader = document.createElement("div");
+      dateHeader.className = "completed-date-header";
+      dateHeader.innerHTML = `
+        <span>📅 ${formatDate(date)}</span>
+        <span>${dateAppts.length} patient(s)</span>
+      `;
+      dateFolder.appendChild(dateHeader);
+
+      let dateContent = document.createElement("div");
+      dateContent.className = "completed-date-content";
+      dateContent.style.display = "block";
+
+      dateAppts.forEach(app => {
+        let row = document.createElement("div");
+        row.className = "completed-row";
+        row.innerHTML = `
+          <div class="info">
+            <p><strong>👤 ${app.fullname}</strong></p>
+            <p>📧 ${app.email} &nbsp;|&nbsp; 📞 ${app.phone}</p>
+            <p>🕐 Time: ${formatTime(app.time)}</p>
+            <p style="font-size:11px; color:#888;">Booked on: ${formatBookedOn(app.created_at)}</p>
+          </div>
+          <span class="completed-badge">✅ Completed</span>
+        `;
+        dateContent.appendChild(row);
+      });
+
+      dateFolder.appendChild(dateContent);
+      fContent.appendChild(dateFolder);
+
+      dateHeader.addEventListener("click", () => {
+        dateContent.style.display = dateContent.style.display === "none" ? "block" : "none";
+      });
+    });
+
+    folder.appendChild(fContent);
+    listEl.appendChild(folder);
+
+    fHeader.addEventListener("click", () => {
+      fContent.style.display = fContent.style.display === "none" ? "block" : "none";
+    });
+  });
+}
+
+// LOAD APPOINTMENTS ON START
 loadAppointments();
 
 </script>
