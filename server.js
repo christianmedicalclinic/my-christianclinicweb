@@ -16,11 +16,19 @@ const db = new Pool({
     }
 });
 
-// TEST DB CONNECTION
+// TEST DB CONNECTION + ADD STATUS COLUMN IF NOT EXISTS
 (async () => {
     try {
         await db.query('SELECT 1');
         console.log('Database connected');
+
+        // ADD STATUS COLUMN IF IT DOESN'T EXIST YET
+        await db.query(`
+            ALTER TABLE appointments
+            ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'new'
+        `);
+        console.log('Status column ready');
+
     } catch (err) {
         console.log('DB ERROR:', err.message);
     }
@@ -68,6 +76,7 @@ app.get('/admin-login', (req, res) => {
 
 // ------------------------
 // BOOK APPOINTMENT
+// (no auto email — admin confirms manually)
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
@@ -81,7 +90,7 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "Please fill all fields" });
         }
 
-        // DAILY LIMIT + SLOT LIMIT (run both at the same time)
+        // DAILY LIMIT + SLOT LIMIT
         const [countDay, countSlot] = await Promise.all([
             db.query(
                 "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
@@ -101,82 +110,18 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "This time slot is fully booked." });
         }
 
-        // INSERT INTO DATABASE
+        // INSERT INTO DATABASE (status defaults to 'new')
         await db.query(
             `INSERT INTO appointments
-            (fullname, email, phone, service, appointment_date, time)
-            VALUES ($1, $2, $3, $4, $5, $6)`,
+            (fullname, email, phone, service, appointment_date, time, status)
+            VALUES ($1, $2, $3, $4, $5, $6, 'new')`,
             [fullname, email, phone, service, date, time]
         );
 
-        console.log("Appointment inserted");
-
-        // SEND EMAIL (background - don't make user wait)
-        const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-        sendSmtpEmail.subject = "Appointment Confirmation - Christian Medical Clinic";
-        sendSmtpEmail.htmlContent = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
-
-                <div style="background:#0a8f08; padding: 20px; text-align: center;">
-                    <h1 style="color: white; margin: 0;">Christian Medical Clinic</h1>
-                </div>
-
-                <div style="padding: 30px;">
-                    <h2 style="color: #0a8f08;">Appointment Confirmed ✅</h2>
-
-                    <p>Dear <strong>${fullname}</strong>,</p>
-                    <p>Your appointment has been successfully booked. Here are your details:</p>
-
-                    <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
-                        <tr style="background:#f4f4f4;">
-                            <td style="padding: 10px; font-weight: bold;">Service</td>
-                            <td style="padding: 10px;">${service}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; font-weight: bold;">Date</td>
-                            <td style="padding: 10px;">${date}</td>
-                        </tr>
-                        <tr style="background:#f4f4f4;">
-                            <td style="padding: 10px; font-weight: bold;">Time</td>
-                            <td style="padding: 10px;">${time}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; font-weight: bold;">Phone</td>
-                            <td style="padding: 10px;">${phone}</td>
-                        </tr>
-                    </table>
-
-                    <div style="background:#fff8e1; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                        <p style="margin:0; font-weight: bold;">⚠️ Important Reminders:</p>
-                        <ul style="margin: 10px 0 0 20px;">
-                            <li>Please arrive <strong>10-15 minutes before</strong> your scheduled time.</li>
-                            <li>Late arrivals may result in your slot being given to the next patient.</li>
-                            <li>Bring a valid ID and any relevant medical records.</li>
-                            <li>If you need to cancel or reschedule, please call us at least <strong>1 day before</strong> your appointment.</li>
-                        </ul>
-                    </div>
-
-                    <p>We look forward to seeing you on <strong>${date}</strong> at <strong>${time}</strong>.</p>
-
-                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-
-                    <p style="margin:0;"><strong>Christian Medical Clinic</strong></p>
-                    <p style="margin:0;">📞 901-5090 / 759-7116</p>
-                    <p style="margin:0;">📧 christianmed.inc23@yahoo.com</p>
-                    <p style="margin:0;">📍 22-B Madison Street, New Manila, Quezon City</p>
-                </div>
-
-            </div>
-        `;
-        sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Christian Medical Clinic" };
-        sendSmtpEmail.to = [{ email: email.trim() }];
-
-        emailApi.sendTransacEmail(sendSmtpEmail)
-            .then(() => console.log("EMAIL SENT SUCCESSFULLY"))
-            .catch(err => console.log("EMAIL ERROR:", err.message));
+        console.log("Appointment inserted — waiting for admin confirmation");
 
         return res.json({
-            message: "Appointment booked successfully!"
+            message: "Appointment booked successfully! You will receive a confirmation email once the admin confirms your appointment."
         });
 
     } catch (err) {
@@ -197,7 +142,7 @@ app.get('/appointments', async (req, res) => {
     try {
 
         const result = await db.query(
-            "SELECT * FROM appointments ORDER BY id DESC"
+            "SELECT * FROM appointments ORDER BY appointment_date ASC, time ASC"
         );
 
         res.json(result.rows);
@@ -209,6 +154,118 @@ app.get('/appointments', async (req, res) => {
         res.status(500).json({
             message: "Failed to fetch appointments"
         });
+    }
+});
+
+// ------------------------
+// UPDATE APPOINTMENT STATUS
+// (confirm or cancel — triggers email on confirm)
+// ------------------------
+app.patch('/update-appointment/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!['confirmed', 'cancelled'].includes(status)) {
+            return res.status(400).json({ message: "Invalid status." });
+        }
+
+        // GET APPOINTMENT DETAILS FIRST
+        const appt = await db.query(
+            "SELECT * FROM appointments WHERE id = $1",
+            [id]
+        );
+
+        if (appt.rows.length === 0) {
+            return res.status(404).json({ message: "Appointment not found." });
+        }
+
+        const { fullname, email, phone, service, appointment_date, time } = appt.rows[0];
+
+        // UPDATE STATUS
+        await db.query(
+            "UPDATE appointments SET status = $1 WHERE id = $2",
+            [status, id]
+        );
+
+        console.log(`Appointment ${id} marked as ${status}`);
+
+        // SEND EMAIL ONLY IF CONFIRMED
+        if (status === 'confirmed') {
+
+            const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+            sendSmtpEmail.subject = "Appointment Confirmed - Christian Medical Clinic";
+            sendSmtpEmail.htmlContent = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+
+                    <div style="background:#0a8f08; padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">Christian Medical Clinic</h1>
+                    </div>
+
+                    <div style="padding: 30px;">
+                        <h2 style="color: #0a8f08;">Appointment Confirmed ✅</h2>
+
+                        <p>Dear <strong>${fullname}</strong>,</p>
+                        <p>Your appointment has been reviewed and confirmed by our admin. Here are your details:</p>
+
+                        <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                            <tr style="background:#f4f4f4;">
+                                <td style="padding: 10px; font-weight: bold;">Service</td>
+                                <td style="padding: 10px;">${service}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold;">Date</td>
+                                <td style="padding: 10px;">${appointment_date}</td>
+                            </tr>
+                            <tr style="background:#f4f4f4;">
+                                <td style="padding: 10px; font-weight: bold;">Time</td>
+                                <td style="padding: 10px;">${time}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold;">Phone</td>
+                                <td style="padding: 10px;">${phone}</td>
+                            </tr>
+                        </table>
+
+                        <div style="background:#fff8e1; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                            <p style="margin:0; font-weight: bold;">⚠️ Important Reminders:</p>
+                            <ul style="margin: 10px 0 0 20px;">
+                                <li>Please arrive <strong>10-15 minutes before</strong> your scheduled time.</li>
+                                <li>Late arrivals may result in your slot being given to the next patient.</li>
+                                <li>Bring a valid ID and any relevant medical records.</li>
+                                <li>If you need to cancel or reschedule, please call us at least <strong>1 day before</strong> your appointment.</li>
+                            </ul>
+                        </div>
+
+                        <p>We look forward to seeing you on <strong>${appointment_date}</strong> at <strong>${time}</strong>.</p>
+
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+                        <p style="margin:0;"><strong>Christian Medical Clinic</strong></p>
+                        <p style="margin:0;">📞 901-5090 / 759-7116</p>
+                        <p style="margin:0;">📧 christianmed.inc23@yahoo.com</p>
+                        <p style="margin:0;">📍 22-B Madison Street, New Manila, Quezon City</p>
+                    </div>
+
+                </div>
+            `;
+            sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Christian Medical Clinic" };
+            sendSmtpEmail.to = [{ email: email.trim() }];
+
+            emailApi.sendTransacEmail(sendSmtpEmail)
+                .then(() => console.log("CONFIRMATION EMAIL SENT to", email))
+                .catch(err => console.log("EMAIL ERROR:", err.message));
+        }
+
+        return res.json({ message: `Appointment ${status} successfully.` });
+
+    } catch (err) {
+
+        console.log(err.message);
+
+        res.status(500).json({ message: "Failed to update appointment." });
     }
 });
 
