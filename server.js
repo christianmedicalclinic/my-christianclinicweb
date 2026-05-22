@@ -362,6 +362,38 @@ message: "Delete failed"
 });
 
 // ------------------------
+// GET SLOT COUNT
+// ------------------------
+app.get('/slot-count', async (req, res) => {
+
+try {
+
+const { date, time } = req.query;
+
+if (!date || !time) {
+return res.status(400).json({ message: "Date and time required." });
+}
+
+const result = await db.query(
+"SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
+[date, time]
+);
+
+const booked = parseInt(result.rows[0].count);
+const max = 12;
+const remaining = max - booked;
+
+res.json({ booked, max, remaining });
+
+} catch (err) {
+
+console.log(err.message);
+
+res.status(500).json({ message: "Failed to get slot count." });
+}
+});
+
+// ------------------------
 // START SERVER
 // ------------------------
 app.listen(PORT, () => {
