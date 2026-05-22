@@ -82,6 +82,7 @@ h3 {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 13px;
 }
 
 .delete-btn:hover {
@@ -158,6 +159,57 @@ h3 {
     padding: 10px;
 }
 
+/* STATUS FOLDER */
+.status-folder {
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.status-header {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.status-header.new {
+    background: #1a6fb5;
+    color: white;
+}
+
+.status-header.new:hover {
+    background: #155fa0;
+}
+
+.status-header.confirmed {
+    background: #198754;
+    color: white;
+}
+
+.status-header.confirmed:hover {
+    background: #146e44;
+}
+
+.status-header.cancelled {
+    background: #b52a37;
+    color: white;
+}
+
+.status-header.cancelled:hover {
+    background: #9b2130;
+}
+
+.status-content {
+    padding: 10px;
+    background: #fff;
+}
+
 /* TIME FOLDER */
 .time-folder {
     margin-bottom: 10px;
@@ -189,6 +241,68 @@ h3 {
 
 .folder-icon {
     margin-right: 8px;
+}
+
+/* STATUS BADGE */
+.status-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.status-badge.new {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-badge.confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ACTION BUTTONS */
+.action-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.confirm-btn {
+    background: #198754;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.confirm-btn:hover {
+    background: #146e44;
+}
+
+.cancel-appt-btn {
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.cancel-appt-btn:hover {
+    background: #545b62;
 }
 </style>
 </head>
@@ -292,6 +406,38 @@ function clearSearch() {
     renderAppointments(allAppointments, null);
 }
 
+async function confirmAppointment(id) {
+    if (!confirm("Confirm this appointment?")) return;
+    try {
+        const response = await fetch(`/update-appointment/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'confirmed' })
+        });
+        const result = await response.json();
+        alert(result.message || "Appointment confirmed.");
+        loadAppointments();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function cancelAppointment(id) {
+    if (!confirm("Cancel this appointment?")) return;
+    try {
+        const response = await fetch(`/update-appointment/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+        });
+        const result = await response.json();
+        alert(result.message || "Appointment cancelled.");
+        loadAppointments();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 function renderAppointments(appointments, filterDate) {
 
     let container = document.getElementById("appointments");
@@ -345,6 +491,7 @@ function renderAppointments(appointments, filterDate) {
         let deleteAllBtn = document.createElement("button");
         deleteAllBtn.className = "delete-btn";
         deleteAllBtn.textContent = "Delete All";
+        deleteAllBtn.style.marginLeft = "10px";
         deleteAllBtn.onclick = async function(e) {
             e.stopPropagation();
             if (confirm("Delete all appointments for this date?")) {
@@ -363,7 +510,7 @@ function renderAppointments(appointments, filterDate) {
         let content = document.createElement("div");
         content.className = "date-content";
 
-        // GROUP BY SERVICE FIRST
+        // GROUP BY SERVICE
         let groupedByService = {};
         groupedByDate[date].forEach(app => {
             const serviceName = app.service || "Unknown Service";
@@ -388,50 +535,120 @@ function renderAppointments(appointments, filterDate) {
             let serviceContent = document.createElement("div");
             serviceContent.className = "service-content";
 
-            // GROUP BY TIME WITHIN SERVICE
-            let groupedByTime = {};
-            groupedByService[service].forEach(app => {
-                if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
-                groupedByTime[app.time].push(app);
-            });
+            // STATUS SUB-FOLDERS: new, confirmed, cancelled
+            const statusList = [
+                { key: 'new',       label: '🆕 New Appointments',    icon: '🆕' },
+                { key: 'confirmed', label: '✅ Confirmed Appointments', icon: '✅' },
+                { key: 'cancelled', label: '❌ Cancelled Appointments', icon: '❌' }
+            ];
 
-            // LOOP THROUGH TIME SLOTS
-            Object.keys(groupedByTime).sort().forEach(time => {
+            statusList.forEach(({ key, label }) => {
 
-                let timeFolder = document.createElement("div");
-                timeFolder.className = "time-folder";
+                const statusAppts = groupedByService[service].filter(a => (a.status || 'new') === key);
 
-                let timeHeader = document.createElement("div");
-                timeHeader.className = "time-header";
-                timeHeader.innerHTML = `
-                    <span><span class="folder-icon">🕐</span>${formatTime(time)}</span>
-                    <span>${groupedByTime[time].length} / 12 booked</span>
+                let statusFolder = document.createElement("div");
+                statusFolder.className = "status-folder";
+
+                let statusHeader = document.createElement("div");
+                statusHeader.className = `status-header ${key}`;
+                statusHeader.innerHTML = `
+                    <span>${label}</span>
+                    <span>${statusAppts.length} appointment(s)</span>
                 `;
-                timeFolder.appendChild(timeHeader);
+                statusFolder.appendChild(statusHeader);
 
-                let timeContent = document.createElement("div");
-                timeContent.className = "time-content";
+                let statusContent = document.createElement("div");
+                statusContent.className = "status-content";
 
-                // INDIVIDUAL APPOINTMENTS
-                groupedByTime[time].forEach(app => {
-                    let div = document.createElement("div");
-                    div.className = "msg-box";
-                    div.innerHTML = `
-                        <p><strong>Name:</strong> ${app.fullname}</p>
-                        <p><strong>Email:</strong> ${app.email}</p>
-                        <p><strong>Phone:</strong> ${app.phone}</p>
-                        <button class="delete-btn" onclick="deleteAppointment(${app.id})">Delete</button>
-                    `;
-                    timeContent.appendChild(div);
-                });
+                if (statusAppts.length === 0) {
+                    statusContent.innerHTML = `<p style="color:#888;font-size:13px;">No ${key} appointments.</p>`;
+                } else {
 
-                timeFolder.appendChild(timeContent);
-                serviceContent.appendChild(timeFolder);
+                    // GROUP BY TIME WITHIN STATUS
+                    let groupedByTime = {};
+                    statusAppts.forEach(app => {
+                        if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
+                        groupedByTime[app.time].push(app);
+                    });
 
-                // TOGGLE TIME FOLDER
-                timeHeader.addEventListener("click", (e) => {
+                    // LOOP THROUGH TIME SLOTS
+                    Object.keys(groupedByTime).sort().forEach(time => {
+
+                        let timeFolder = document.createElement("div");
+                        timeFolder.className = "time-folder";
+
+                        let timeHeader = document.createElement("div");
+                        timeHeader.className = "time-header";
+                        timeHeader.innerHTML = `
+                            <span><span class="folder-icon">🕐</span>${formatTime(time)}</span>
+                            <span>${groupedByTime[time].length} / 12 booked</span>
+                        `;
+                        timeFolder.appendChild(timeHeader);
+
+                        let timeContent = document.createElement("div");
+                        timeContent.className = "time-content";
+
+                        // INDIVIDUAL APPOINTMENTS
+                        groupedByTime[time].forEach(app => {
+                            let div = document.createElement("div");
+                            div.className = "msg-box";
+
+                            const appStatus = app.status || 'new';
+
+                            div.innerHTML = `
+                                <span class="status-badge ${appStatus}">${appStatus.charAt(0).toUpperCase() + appStatus.slice(1)}</span>
+                                <p><strong>Name:</strong> ${app.fullname}</p>
+                                <p><strong>Email:</strong> ${app.email}</p>
+                                <p><strong>Phone:</strong> ${app.phone}</p>
+                                <p><strong>Service:</strong> ${app.service || 'N/A'}</p>
+                            `;
+
+                            let actionRow = document.createElement("div");
+                            actionRow.className = "action-btns";
+
+                            // CONFIRM & CANCEL BUTTONS — only for new appointments
+                            if (appStatus === 'new') {
+                                let confirmBtn = document.createElement("button");
+                                confirmBtn.className = "confirm-btn";
+                                confirmBtn.textContent = "✔ Confirm";
+                                confirmBtn.onclick = () => confirmAppointment(app.id);
+                                actionRow.appendChild(confirmBtn);
+
+                                let cancelBtn = document.createElement("button");
+                                cancelBtn.className = "cancel-appt-btn";
+                                cancelBtn.textContent = "✖ Cancel";
+                                cancelBtn.onclick = () => cancelAppointment(app.id);
+                                actionRow.appendChild(cancelBtn);
+                            }
+
+                            let deleteBtn = document.createElement("button");
+                            deleteBtn.className = "delete-btn";
+                            deleteBtn.textContent = "Delete";
+                            deleteBtn.onclick = () => deleteAppointment(app.id);
+                            actionRow.appendChild(deleteBtn);
+
+                            div.appendChild(actionRow);
+                            timeContent.appendChild(div);
+                        });
+
+                        timeFolder.appendChild(timeContent);
+                        statusContent.appendChild(timeFolder);
+
+                        // TOGGLE TIME FOLDER
+                        timeHeader.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            timeContent.style.display = timeContent.style.display === "none" ? "block" : "none";
+                        });
+                    });
+                }
+
+                statusFolder.appendChild(statusContent);
+                serviceContent.appendChild(statusFolder);
+
+                // TOGGLE STATUS FOLDER
+                statusHeader.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    timeContent.style.display = timeContent.style.display === "none" ? "block" : "none";
+                    statusContent.style.display = statusContent.style.display === "none" ? "block" : "none";
                 });
 
             });
