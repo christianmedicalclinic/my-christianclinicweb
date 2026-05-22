@@ -7,136 +7,163 @@
 
 <style>
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: Arial, sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: Arial, sans-serif;
 }
 
 body{
-  background:#dfe6e9;
+background:#dfe6e9;
 }
 
 header{
-  background:#0a8f08;
-  color:white;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 60px;
-  flex-wrap: wrap;
+background:#0a8f08;
+color:white;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 60px;
+flex-wrap: wrap;
 }
 
 header h1{
-  font-size:2rem;
-  margin-bottom:10px;
+font-size:2rem;
+margin-bottom:10px;
 }
 
 nav{
-  display:flex;
-  gap:15px;
-  flex-wrap: wrap;
+display:flex;
+gap:15px;
+flex-wrap: wrap;
 }
 
 nav li{
-  list-style:none;
+list-style:none;
 }
 
 nav a{
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-  font-size:1rem;
+color:white;
+text-decoration:none;
+font-weight:bold;
+font-size:1rem;
 }
 
 .container{
-  display:flex;
-  justify-content:space-between;
-  padding:70px 100px;
-  flex-wrap: wrap;
-  gap:20px;
+display:flex;
+justify-content:space-between;
+padding:70px 100px;
+flex-wrap: wrap;
+gap:20px;
 }
 
 .left{
-  flex:1 1 300px;
-  max-width:500px;
+flex:1 1 300px;
+max-width:500px;
 }
 
 .left h2{
-  font-size:2.5rem;
-  color:#0a8f08;
-  margin-bottom:20px;
+font-size:2.5rem;
+color:#0a8f08;
+margin-bottom:20px;
 }
 
 .info{
-  margin-top:30px;
+margin-top:30px;
 }
 
 .info p{
-  margin-bottom:20px;
+margin-bottom:20px;
 }
 
 .right{
-  flex:1 1 300px;
-  max-width:500px;
-  background:#eeeeee;
-  padding:30px;
-  border-radius:12px;
+flex:1 1 300px;
+max-width:500px;
+background:#eeeeee;
+padding:30px;
+border-radius:12px;
 }
 
 input, select{
-  width:100%;
-  padding:14px;
-  margin-bottom:15px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:1rem;
+width:100%;
+padding:14px;
+margin-bottom:15px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:1rem;
 }
 
 button{
-  background:#0a8f08;
-  color:white;
-  border:none;
-  padding:15px;
-  width:80%;
-  max-width:200px;
-  border-radius:8px;
-  font-size:1.1rem;
-  cursor:pointer;
-  display:block;
-  margin:20px auto;
+background:#0a8f08;
+color:white;
+border:none;
+padding:15px;
+width:80%;
+max-width:200px;
+border-radius:8px;
+font-size:1.1rem;
+cursor:pointer;
+display:block;
+margin:20px auto;
 }
 
 button:hover{
-  background:#066606;
+background:#066606;
 }
 
 .message{
-  margin-top:10px;
-  font-weight:bold;
-  text-align:center;
+margin-top:10px;
+font-weight:bold;
+text-align:center;
+}
+
+.slot-info{
+font-size:0.9rem;
+font-weight:bold;
+margin-top:-10px;
+margin-bottom:15px;
+padding:10px 14px;
+border-radius:8px;
+}
+
+.slot-info.available{
+background:#e8f5e9;
+color:#2e7d32;
+border:1px solid #a5d6a7;
+}
+
+.slot-info.full{
+background:#fdecea;
+color:#c0392b;
+border:1px solid #ef9a9a;
+}
+
+.slot-info.loading{
+background:#f5f5f5;
+color:#888;
+border:1px solid #ddd;
 }
 
 @media (max-width:900px){
-  .container{
-    flex-direction: column;
-    align-items: center;
-    padding:40px 20px;
-  }
+.container{
+flex-direction: column;
+align-items: center;
+padding:40px 20px;
+}
 
-  .left, .right{
-    width:90%;
-  }
+.left, .right{
+width:90%;
+}
 
-  header{
-    padding:15px 20px;
-    flex-direction: column;
-    align-items:flex-start;
-  }
+header{
+padding:15px 20px;
+flex-direction: column;
+align-items:flex-start;
+}
 
-  button{
-    width:100%;
-  }
+button{
+width:100%;
+}
 }
 </style>
 </head>
@@ -183,12 +210,12 @@ button:hover{
 <option value="Laboratory">Laboratory</option>
 <option value="X-RAY">X-RAY</option>
 <option value="Vaccination">Vaccination</option>
-  <option value="Optical">Optical</option>
+<option value="Optical">Optical</option>
 </select>
 
-<input type="date" name="date" required>
+<input type="date" id="date" name="date" required>
 
-<select name="time" required>
+<select id="time" name="time" required>
 <option value="">Select Time</option>
 <option value="08:00">8:00 AM</option>
 <option value="09:00">9:00 AM</option>
@@ -200,7 +227,10 @@ button:hover{
 <option value="16:00">4:00 PM</option>
 </select>
 
-<button type="submit">Book Appointment</button>
+<!-- SLOT COUNT DISPLAY -->
+<div id="slot-info" class="slot-info" style="display:none;"></div>
+
+<button type="submit" id="submitBtn">Book Appointment</button>
 <div class="message" id="message"></div>
 
 </form>
@@ -211,73 +241,117 @@ button:hover{
 <script>
 const form = document.getElementById('bookingForm');
 const messageDiv = document.getElementById('message');
+const dateInput = document.getElementById('date');
+const timeInput = document.getElementById('time');
+const slotInfo = document.getElementById('slot-info');
+const submitBtn = document.getElementById('submitBtn');
 
+// ------------------------
+// CHECK SLOT AVAILABILITY
+// ------------------------
+async function checkSlot() {
+const date = dateInput.value;
+const time = timeInput.value;
+
+if (!date || !time) {
+slotInfo.style.display = 'none';
+return;
+}
+
+slotInfo.style.display = 'block';
+slotInfo.className = 'slot-info loading';
+slotInfo.textContent = 'Checking availability...';
+submitBtn.disabled = true;
+
+try {
+const res = await fetch(`/slot-count?date=${date}&time=${time}`);
+const data = await res.json();
+
+if (data.remaining <= 0) {
+slotInfo.className = 'slot-info full';
+slotInfo.textContent = `⛔ This slot is fully booked (${data.booked}/${data.max} slots taken).`;
+submitBtn.disabled = true;
+} else {
+slotInfo.className = 'slot-info available';
+slotInfo.textContent = `✅ ${data.booked} out of ${data.max} slots taken — ${data.remaining} slot(s) still available.`;
+submitBtn.disabled = false;
+}
+
+} catch (err) {
+slotInfo.style.display = 'none';
+submitBtn.disabled = false;
+console.error('Slot check error:', err);
+}
+}
+
+dateInput.addEventListener('change', checkSlot);
+timeInput.addEventListener('change', checkSlot);
+
+// ------------------------
+// SUBMIT BOOKING
+// ------------------------
 form.addEventListener('submit', async function(e) {
 
-    e.preventDefault();
+e.preventDefault();
 
-    messageDiv.style.color = "black";
-    messageDiv.textContent = "Booking appointment...";
+messageDiv.style.color = "black";
+messageDiv.textContent = "Booking appointment...";
 
-    // GET FORM DATA
-    const formData = new FormData(form);
+const formData = new FormData(form);
 
-    const data = {
-        fullname: formData.get('fullname'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        service: formData.get('service'),
-        date: formData.get('date'),
-        time: formData.get('time')
-    };
+const data = {
+fullname: formData.get('fullname'),
+email: formData.get('email'),
+phone: formData.get('phone'),
+service: formData.get('service'),
+date: formData.get('date'),
+time: formData.get('time')
+};
 
-    console.log("Sending:", data);
+console.log("Sending:", data);
 
-    try {
+try {
 
-        // SEND TO SERVER
-        const response = await fetch('/book-appointment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+const response = await fetch('/book-appointment', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
 
-        // GET JSON RESPONSE
-        const result = await response.json();
+const result = await response.json();
 
-        console.log("SERVER RESPONSE:", result);
+console.log("SERVER RESPONSE:", result);
 
-        // SHOW MESSAGE
-        messageDiv.textContent = result.message;
+messageDiv.textContent = result.message;
 
-        // SUCCESS
-        if (response.ok) {
+if (response.ok) {
 
-            messageDiv.style.color = "green";
+messageDiv.style.color = "green";
 
-            // RESET FORM
-            form.reset();
+form.reset();
+slotInfo.style.display = 'none';
+submitBtn.disabled = false;
 
-        } else {
+} else {
 
-            messageDiv.style.color = "red";
+messageDiv.style.color = "red";
 
-        }
+}
 
-    } catch (error) {
+} catch (error) {
 
-        console.log("FETCH ERROR:", error);
+console.log("FETCH ERROR:", error);
 
-        messageDiv.style.color = "red";
+messageDiv.style.color = "red";
 
-        messageDiv.textContent = "Cannot connect to server";
+messageDiv.textContent = "Cannot connect to server";
 
-    }
+}
 
 });
 </script>
 
 </body>
-</html> 
+</html>
