@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
-const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,27 +27,14 @@ const db = new Pool({
 })();
 
 // ------------------------
-// GMAIL EMAIL SETUP
+// BREVO EMAIL SETUP
 // ------------------------
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
-// VERIFY EMAIL CONFIG AT STARTUP
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS set:", !!process.env.EMAIL_PASS);
-
-transporter.verify((error, success) => {
-    if (error) {
-        console.log("EMAIL CONFIG ERROR:", error.message);
-    } else {
-        console.log("Email server ready");
-    }
-});
+console.log("BREVO_API_KEY set:", !!process.env.BREVO_API_KEY);
 
 // ------------------------
 // MIDDLEWARE
@@ -125,24 +112,21 @@ app.post('/book-appointment', async (req, res) => {
         console.log("Appointment inserted");
 
         // SEND EMAIL (background - don't make user wait)
-        transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email.trim(),
-            subject: "Appointment Confirmation",
-            html: `
-                <h2>Appointment Confirmed</h2>
+        const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+        sendSmtpEmail.subject = "Appointment Confirmation";
+        sendSmtpEmail.htmlContent = `
+            <h2>Appointment Confirmed</h2>
+            <p><strong>Name:</strong> ${fullname}</p>
+            <p><strong>Service:</strong> ${service}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Time:</strong> ${time}</p>
+        `;
+        sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Appointment System" };
+        sendSmtpEmail.to = [{ email: email.trim() }];
 
-                <p><strong>Name:</strong> ${fullname}</p>
-
-                <p><strong>Service:</strong> ${service}</p>
-
-                <p><strong>Date:</strong> ${date}</p>
-
-                <p><strong>Time:</strong> ${time}</p>
-            `
-        })
-        .then(() => console.log("EMAIL SENT SUCCESSFULLY"))
-        .catch(err => console.log("EMAIL ERROR:", err.message));
+        emailApi.sendTransacEmail(sendSmtpEmail)
+            .then(() => console.log("EMAIL SENT SUCCESSFULLY"))
+            .catch(err => console.log("EMAIL ERROR:", err.message));
 
         return res.json({
             message: "Appointment booked successfully!"
