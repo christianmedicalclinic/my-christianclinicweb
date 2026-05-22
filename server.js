@@ -113,15 +113,62 @@ app.post('/book-appointment', async (req, res) => {
 
         // SEND EMAIL (background - don't make user wait)
         const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-        sendSmtpEmail.subject = "Appointment Confirmation";
+        sendSmtpEmail.subject = "Appointment Confirmation - Christian Medical Clinic";
         sendSmtpEmail.htmlContent = `
-            <h2>Appointment Confirmed</h2>
-            <p><strong>Name:</strong> ${fullname}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <p><strong>Date:</strong> ${date}</p>
-            <p><strong>Time:</strong> ${time}</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+
+                <div style="background:#0a8f08; padding: 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0;">Christian Medical Clinic</h1>
+                </div>
+
+                <div style="padding: 30px;">
+                    <h2 style="color: #0a8f08;">Appointment Confirmed ✅</h2>
+
+                    <p>Dear <strong>${fullname}</strong>,</p>
+                    <p>Your appointment has been successfully booked. Here are your details:</p>
+
+                    <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr style="background:#f4f4f4;">
+                            <td style="padding: 10px; font-weight: bold;">Service</td>
+                            <td style="padding: 10px;">${service}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">Date</td>
+                            <td style="padding: 10px;">${date}</td>
+                        </tr>
+                        <tr style="background:#f4f4f4;">
+                            <td style="padding: 10px; font-weight: bold;">Time</td>
+                            <td style="padding: 10px;">${time}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">Phone</td>
+                            <td style="padding: 10px;">${phone}</td>
+                        </tr>
+                    </table>
+
+                    <div style="background:#fff8e1; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                        <p style="margin:0; font-weight: bold;">⚠️ Important Reminders:</p>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>Please arrive <strong>10-15 minutes before</strong> your scheduled time.</li>
+                            <li>Late arrivals may result in your slot being given to the next patient.</li>
+                            <li>Bring a valid ID and any relevant medical records.</li>
+                            <li>If you need to cancel or reschedule, please call us at least <strong>1 day before</strong> your appointment.</li>
+                        </ul>
+                    </div>
+
+                    <p>We look forward to seeing you on <strong>${date}</strong> at <strong>${time}</strong>.</p>
+
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+                    <p style="margin:0;"><strong>Christian Medical Clinic</strong></p>
+                    <p style="margin:0;">📞 901-5090 / 759-7116</p>
+                    <p style="margin:0;">📧 christianmed.inc23@yahoo.com</p>
+                    <p style="margin:0;">📍 22-B Madison Street, New Manila, Quezon City</p>
+                </div>
+
+            </div>
         `;
-        sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Appointment System" };
+        sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Christian Medical Clinic" };
         sendSmtpEmail.to = [{ email: email.trim() }];
 
         emailApi.sendTransacEmail(sendSmtpEmail)
