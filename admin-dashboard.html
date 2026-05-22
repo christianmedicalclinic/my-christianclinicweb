@@ -129,6 +129,67 @@ h3 {
 .search-bar .clear-btn:hover {
     background: #545b62;
 }
+
+/* SERVICE FOLDER */
+.service-folder {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+
+.service-header {
+    background: #117b0b;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 6px 6px 0 0;
+}
+
+.service-header:hover {
+    background: #0e6a09;
+}
+
+.service-content {
+    padding: 10px;
+}
+
+/* TIME FOLDER */
+.time-folder {
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.time-header {
+    background: #28a745;
+    color: white;
+    padding: 6px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 5px 5px 0 0;
+    font-size: 0.95rem;
+}
+
+.time-header:hover {
+    background: #218838;
+}
+
+.time-content {
+    padding: 8px;
+}
+
+.folder-icon {
+    margin-right: 8px;
+}
 </style>
 </head>
 
@@ -274,7 +335,7 @@ function renderAppointments(appointments, filterDate) {
         let header = document.createElement("div");
         header.className = "date-header";
         header.innerHTML = `
-            <span>Date: ${formatDate(date)}</span>
+            <span>📅 Date: ${formatDate(date)}</span>
             <span class="date-counter">${groupedByDate[date].length} / 100</span>
         `;
 
@@ -302,31 +363,86 @@ function renderAppointments(appointments, filterDate) {
         let content = document.createElement("div");
         content.className = "date-content";
 
-        let groupedByTime = {};
+        // GROUP BY SERVICE FIRST
+        let groupedByService = {};
         groupedByDate[date].forEach(app => {
-            if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
-            groupedByTime[app.time].push(app);
+            const serviceName = app.service || "Unknown Service";
+            if (!groupedByService[serviceName]) groupedByService[serviceName] = [];
+            groupedByService[serviceName].push(app);
         });
 
-        Object.keys(groupedByTime).sort().forEach(time => {
+        // LOOP THROUGH SERVICES
+        Object.keys(groupedByService).sort().forEach(service => {
 
-            let timeHeader = document.createElement("div");
-            timeHeader.style.fontWeight = "bold";
-            timeHeader.style.marginBottom = "10px";
-            timeHeader.textContent = `${formatTime(time)} → ${groupedByTime[time].length} / 12 booked`;
-            content.appendChild(timeHeader);
+            let serviceFolder = document.createElement("div");
+            serviceFolder.className = "service-folder";
 
-            groupedByTime[time].forEach(app => {
-                let div = document.createElement("div");
-                div.className = "msg-box";
-                div.innerHTML = `
-                    <p><strong>Name:</strong> ${app.fullname}</p>
-                    <p><strong>Email:</strong> ${app.email}</p>
-                    <p><strong>Phone:</strong> ${app.phone}</p>
-                    <p><strong>Service:</strong> ${app.service}</p>
-                    <button class="delete-btn" onclick="deleteAppointment(${app.id})">Delete</button>
+            let serviceHeader = document.createElement("div");
+            serviceHeader.className = "service-header";
+            serviceHeader.innerHTML = `
+                <span><span class="folder-icon">📁</span>${service}</span>
+                <span>${groupedByService[service].length} appointment(s)</span>
+            `;
+            serviceFolder.appendChild(serviceHeader);
+
+            let serviceContent = document.createElement("div");
+            serviceContent.className = "service-content";
+
+            // GROUP BY TIME WITHIN SERVICE
+            let groupedByTime = {};
+            groupedByService[service].forEach(app => {
+                if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
+                groupedByTime[app.time].push(app);
+            });
+
+            // LOOP THROUGH TIME SLOTS
+            Object.keys(groupedByTime).sort().forEach(time => {
+
+                let timeFolder = document.createElement("div");
+                timeFolder.className = "time-folder";
+
+                let timeHeader = document.createElement("div");
+                timeHeader.className = "time-header";
+                timeHeader.innerHTML = `
+                    <span><span class="folder-icon">🕐</span>${formatTime(time)}</span>
+                    <span>${groupedByTime[time].length} / 12 booked</span>
                 `;
-                content.appendChild(div);
+                timeFolder.appendChild(timeHeader);
+
+                let timeContent = document.createElement("div");
+                timeContent.className = "time-content";
+
+                // INDIVIDUAL APPOINTMENTS
+                groupedByTime[time].forEach(app => {
+                    let div = document.createElement("div");
+                    div.className = "msg-box";
+                    div.innerHTML = `
+                        <p><strong>Name:</strong> ${app.fullname}</p>
+                        <p><strong>Email:</strong> ${app.email}</p>
+                        <p><strong>Phone:</strong> ${app.phone}</p>
+                        <button class="delete-btn" onclick="deleteAppointment(${app.id})">Delete</button>
+                    `;
+                    timeContent.appendChild(div);
+                });
+
+                timeFolder.appendChild(timeContent);
+                serviceContent.appendChild(timeFolder);
+
+                // TOGGLE TIME FOLDER
+                timeHeader.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    timeContent.style.display = timeContent.style.display === "none" ? "block" : "none";
+                });
+
+            });
+
+            serviceFolder.appendChild(serviceContent);
+            content.appendChild(serviceFolder);
+
+            // TOGGLE SERVICE FOLDER
+            serviceHeader.addEventListener("click", (e) => {
+                e.stopPropagation();
+                serviceContent.style.display = serviceContent.style.display === "none" ? "block" : "none";
             });
 
         });
