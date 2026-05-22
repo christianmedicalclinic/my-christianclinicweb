@@ -37,6 +37,17 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS set:", !!process.env.EMAIL_PASS);
+
+transporter.verify((error, success) => {
+    if (error) {
+        console.log("EMAIL CONFIG ERROR:", error.message);
+    } else {
+        console.log("Email server ready");
+    }
+});
+
 // ------------------------
 // MIDDLEWARE
 // ------------------------
