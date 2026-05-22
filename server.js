@@ -76,7 +76,7 @@ app.get('/admin-login', (req, res) => {
 
 // ------------------------
 // BOOK APPOINTMENT
-// (no auto email — admin confirms manually)
+// (no auto email - admin confirms manually)
 // ------------------------
 app.post('/book-appointment', async (req, res) => {
 
@@ -118,7 +118,7 @@ app.post('/book-appointment', async (req, res) => {
       [fullname, email, phone, service, date, time]
     );
 
-    console.log("Appointment inserted — waiting for admin confirmation");
+    console.log("Appointment inserted - waiting for admin confirmation");
 
     return res.json({
       message: "Appointment booked successfully! You will receive a confirmation email once the admin confirms your appointment."
@@ -185,7 +185,7 @@ app.get('/completed-appointments', async (req, res) => {
 
 // ------------------------
 // UPDATE APPOINTMENT STATUS
-// (confirm, cancel, or complete — triggers email on confirm/cancel)
+// (confirm, cancel, or complete - triggers email on confirm/cancel)
 // ------------------------
 app.patch('/update-appointment/:id', async (req, res) => {
 
@@ -216,11 +216,11 @@ app.patch('/update-appointment/:id', async (req, res) => {
       [status, id]
     );
 
-    console.log(Appointment ${id} marked as ${status});
+    console.log("Appointment " + id + " marked as " + status);
 
-    // NO EMAIL FOR COMPLETED — just return success
+    // NO EMAIL FOR COMPLETED - just return success
     if (status === 'completed') {
-      console.log(Appointment ${id} completed — no email sent.);
+      console.log("Appointment " + id + " completed - no email sent.");
       return res.json({ message: "Appointment marked as completed." });
     }
 
