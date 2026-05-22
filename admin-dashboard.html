@@ -1029,6 +1029,20 @@ listEl.innerHTML = "<p>Failed to load completed appointments.</p>";
 }
 }
 
+function formatCompletedAt(raw) {
+if (!raw) return 'N/A';
+const d = new Date(raw);
+return d.toLocaleString('en-PH', {
+year: 'numeric',
+month: 'long',
+day: 'numeric',
+hour: 'numeric',
+minute: '2-digit',
+hour12: true,
+timeZone: 'Asia/Manila'
+});
+}
+
 function filterCompleted() {
 const q = document.getElementById("completedSearch").value.toLowerCase();
 if (!q) {
@@ -1144,12 +1158,13 @@ let row = document.createElement("div");
 row.className = "completed-row";
 row.innerHTML = `
 <div class="info">
-<p><strong>👤 ${app.fullname}</strong></p>
-<p>📧 ${app.email} &nbsp;|&nbsp; 📞 ${app.phone}</p>
-<p>🕐 Time: ${formatTime(app.time)}</p>
+<p><strong>${app.fullname}</strong></p>
+<p>${app.email} &nbsp;|&nbsp; ${app.phone}</p>
+<p>Appointment Time: ${formatTime(app.time)}</p>
+<p style="font-size:12px; color:#0a7c5c; font-weight:bold;">Completed on: ${formatCompletedAt(app.completed_at)}</p>
 <p style="font-size:11px; color:#888;">Booked on: ${formatBookedOn(app.created_at)}</p>
 </div>
-<span class="completed-badge">✅ Completed</span>
+<span class="completed-badge">Completed</span>
 `;
 dateContent.appendChild(row);
 });
