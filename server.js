@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
-const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,9 +27,15 @@ const db = new Pool({
 })();
 
 // ------------------------
-// RESEND EMAIL SETUP
+// GMAIL EMAIL SETUP
 // ------------------------
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 // ------------------------
 // MIDDLEWARE
@@ -96,7 +102,7 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "This time slot is fully booked." });
         }
 
-        // INSERT INTO SUPABASE
+        // INSERT INTO DATABASE
         await db.query(
             `INSERT INTO appointments
             (fullname, email, phone, service, appointment_date, time)
@@ -107,37 +113,41 @@ app.post('/book-appointment', async (req, res) => {
         console.log("Appointment inserted");
 
         // ------------------------
-        // EMAIL (RESEND)
+        // SEND EMAIL
         // ------------------------
-        const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+        try {
 
-try {
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email.trim(),
+                subject: "Appointment Confirmation",
+                html: `
+                    <h2>Appointment Confirmed</h2>
 
-    const result = await resend.emails.send({
-        from: "Christian Medical Clinic <onboarding@resend.dev>",
-        to: email.trim(),
-        subject: "Appointment Confirmation",
-        html: `
-            <h2>Appointment Confirmed</h2>
-            <p><strong>Name:</strong> ${fullname}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <p><strong>Date:</strong> ${date}</p>
-            <p><strong>Time:</strong> ${time}</p>
-        `
-    });
+                    <p><strong>Name:</strong> ${fullname}</p>
 
-    console.log("RESEND RESULT:", result);
+                    <p><strong>Service:</strong> ${service}</p>
 
-} catch (err) {
-    console.log("RESEND ERROR:", err);
-}
+                    <p><strong>Date:</strong> ${date}</p>
+
+                    <p><strong>Time:</strong> ${time}</p>
+                `
+            });
+
+            console.log("EMAIL SENT SUCCESSFULLY");
+
+        } catch (err) {
+
+            console.log("EMAIL ERROR:", err.message);
+
+        }
 
         return res.json({
             message: "Appointment booked successfully!"
         });
 
     } catch (err) {
+
         console.log("FULL ERROR:", err.message);
 
         return res.status(500).json({
@@ -152,6 +162,7 @@ try {
 app.get('/appointments', async (req, res) => {
 
     try {
+
         const result = await db.query(
             "SELECT * FROM appointments ORDER BY id DESC"
         );
@@ -159,6 +170,7 @@ app.get('/appointments', async (req, res) => {
         res.json(result.rows);
 
     } catch (err) {
+
         console.log(err.message);
 
         res.status(500).json({
@@ -173,6 +185,7 @@ app.get('/appointments', async (req, res) => {
 app.delete('/delete-appointment/:id', async (req, res) => {
 
     try {
+
         await db.query(
             "DELETE FROM appointments WHERE id = $1",
             [req.params.id]
@@ -183,6 +196,7 @@ app.delete('/delete-appointment/:id', async (req, res) => {
         });
 
     } catch (err) {
+
         console.log(err.message);
 
         res.status(500).json({
