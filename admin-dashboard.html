@@ -176,6 +176,26 @@ function deleteMessage(index) {
    APPOINTMENTS (SUPABASE DATABASE)
 ========================= */
 
+// FORMAT DATE: 2026-05-22T00:00:00.000Z → May 22, 2026
+function formatDate(rawDate) {
+    const d = new Date(rawDate);
+    return d.toLocaleDateString('en-PH', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Manila'
+    });
+}
+
+// FORMAT TIME: 14:00 → 2:00 PM
+function formatTime(rawTime) {
+    const [hour, minute] = rawTime.split(':');
+    const h = parseInt(hour);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${minute} ${ampm}`;
+}
+
 async function loadAppointments() {
 
     let container = document.getElementById("appointments");
@@ -230,7 +250,7 @@ async function loadAppointments() {
 
             header.innerHTML = `
 
-                <span>Date: ${date}</span>
+                <span>Date: ${formatDate(date)}</span>
 
                 <span class="date-counter">
 
@@ -317,7 +337,7 @@ async function loadAppointments() {
 
                 timeHeader.textContent =
 
-                    `${time} → ${groupedByTime[time].length} / 12 booked`;
+                    `${formatTime(time)} → ${groupedByTime[time].length} / 12 booked`;
 
                 content.appendChild(timeHeader);
 
