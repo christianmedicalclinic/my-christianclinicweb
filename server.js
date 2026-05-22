@@ -37,6 +37,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// VERIFY EMAIL CONFIG AT STARTUP
 console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS set:", !!process.env.EMAIL_PASS);
 
@@ -93,21 +94,21 @@ app.post('/book-appointment', async (req, res) => {
             return res.json({ message: "Please fill all fields" });
         }
 
-        // DAILY LIMIT
-        const countDay = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
-            [date]
-        );
+        // DAILY LIMIT + SLOT LIMIT (run both at the same time)
+        const [countDay, countSlot] = await Promise.all([
+            db.query(
+                "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
+                [date]
+            ),
+            db.query(
+                "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
+                [date, time]
+            )
+        ]);
 
         if (parseInt(countDay.rows[0].count) >= 100) {
             return res.json({ message: "Fully booked for this date." });
         }
-
-        // SLOT LIMIT
-        const countSlot = await db.query(
-            "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1 AND time = $2",
-            [date, time]
-        );
 
         if (parseInt(countSlot.rows[0].count) >= 12) {
             return res.json({ message: "This time slot is fully booked." });
@@ -123,35 +124,25 @@ app.post('/book-appointment', async (req, res) => {
 
         console.log("Appointment inserted");
 
-        // ------------------------
-        // SEND EMAIL
-        // ------------------------
-        try {
+        // SEND EMAIL (background - don't make user wait)
+        transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email.trim(),
+            subject: "Appointment Confirmation",
+            html: `
+                <h2>Appointment Confirmed</h2>
 
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: email.trim(),
-                subject: "Appointment Confirmation",
-                html: `
-                    <h2>Appointment Confirmed</h2>
+                <p><strong>Name:</strong> ${fullname}</p>
 
-                    <p><strong>Name:</strong> ${fullname}</p>
+                <p><strong>Service:</strong> ${service}</p>
 
-                    <p><strong>Service:</strong> ${service}</p>
+                <p><strong>Date:</strong> ${date}</p>
 
-                    <p><strong>Date:</strong> ${date}</p>
-
-                    <p><strong>Time:</strong> ${time}</p>
-                `
-            });
-
-            console.log("EMAIL SENT SUCCESSFULLY");
-
-        } catch (err) {
-
-            console.log("EMAIL ERROR:", err.message);
-
-        }
+                <p><strong>Time:</strong> ${time}</p>
+            `
+        })
+        .then(() => console.log("EMAIL SENT SUCCESSFULLY"))
+        .catch(err => console.log("EMAIL ERROR:", err.message));
 
         return res.json({
             message: "Appointment booked successfully!"
