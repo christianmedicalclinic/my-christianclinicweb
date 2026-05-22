@@ -165,10 +165,10 @@ app.get('/completed-appointments', async (req, res) => {
 try {
 
 const result = await db.query(
-`SELECT id, fullname, email, phone, service, appointment_date, time, status, created_at
+`SELECT id, fullname, email, phone, service, appointment_date, time, status, created_at, completed_at
 FROM appointments
 WHERE status = 'completed'
-ORDER BY appointment_date DESC, time ASC`
+ORDER BY completed_at DESC, appointment_date DESC, time ASC`
 );
 
 res.json(result.rows);
@@ -210,19 +210,22 @@ return res.status(404).json({ message: "Appointment not found." });
 
 const { fullname, email, phone, service, appointment_date, time } = appt.rows[0];
 
-// UPDATE STATUS
+// UPDATE STATUS - save completed_at timestamp if completed
+if (status === 'completed') {
+await db.query(
+"UPDATE appointments SET status = $1, completed_at = NOW() WHERE id = $2",
+[status, id]
+);
+console.log("Appointment " + id + " completed - no email sent.");
+return res.json({ message: "Appointment marked as completed." });
+} else {
 await db.query(
 "UPDATE appointments SET status = $1 WHERE id = $2",
 [status, id]
 );
+}
 
 console.log("Appointment " + id + " marked as " + status);
-
-// NO EMAIL FOR COMPLETED - just return success
-if (status === 'completed') {
-console.log("Appointment " + id + " completed - no email sent.");
-return res.json({ message: "Appointment marked as completed." });
-}
 
 const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 sendSmtpEmail.sender = { email: process.env.EMAIL_USER, name: "Christian Medical Clinic" };
@@ -240,7 +243,7 @@ sendSmtpEmail.htmlContent = `
 </div>
 
 <div style="padding: 30px;">
-<h2 style="color: #0a8f08;">Appointment Confirmed ✅</h2>
+<h2 style="color: #0a8f08;">Appointment Confirmed</h2>
 
 <p>Dear <strong>${fullname}</strong>,</p>
 <p>Your appointment has been reviewed and confirmed by our admin. Here are your details:</p>
@@ -265,7 +268,7 @@ sendSmtpEmail.htmlContent = `
 </table>
 
 <div style="background:#fff8e1; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; border-radius: 4px;">
-<p style="margin:0; font-weight: bold;">⚠️ Important Reminders:</p>
+<p style="margin:0; font-weight: bold;">Important Reminders:</p>
 <ul style="margin: 10px 0 0 20px;">
 <li>Please arrive <strong>10-15 minutes before</strong> your scheduled time.</li>
 <li>Late arrivals may result in your slot being given to the next patient.</li>
@@ -279,9 +282,9 @@ sendSmtpEmail.htmlContent = `
 <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
 <p style="margin:0;"><strong>Christian Medical Clinic</strong></p>
-<p style="margin:0;">📞 901-5090 / 759-7116</p>
-<p style="margin:0;">📧 christianmed.inc23@yahoo.com</p>
-<p style="margin:0;">📍 22-B Madison Street, New Manila, Quezon City</p>
+<p style="margin:0;">Tel: 901-5090 / 759-7116</p>
+<p style="margin:0;">Email: christianmed.inc23@yahoo.com</p>
+<p style="margin:0;">Address: 22-B Madison Street, New Manila, Quezon City</p>
 </div>
 
 </div>
@@ -299,7 +302,7 @@ sendSmtpEmail.htmlContent = `
 </div>
 
 <div style="padding: 30px;">
-<h2 style="color: #c0392b;">Appointment Cancellation Notice ❌</h2>
+<h2 style="color: #c0392b;">Appointment Cancellation Notice [CANCELLED]</h2>
 
 <p>Dear <strong>${fullname}</strong>,</p>
 
@@ -327,7 +330,7 @@ sendSmtpEmail.htmlContent = `
 </table>
 
 <div style="background:#fdecea; border-left: 4px solid #c0392b; padding: 15px; margin: 20px 0; border-radius: 4px;">
-<p style="margin:0; font-weight: bold;">📋 What you can do:</p>
+<p style="margin:0; font-weight: bold;">Note: What you can do:</p>
 <ul style="margin: 10px 0 0 20px;">
 <li>Please visit our website or call our clinic to book a new appointment at your most convenient date and time.</li>
 <li>Our staff will be happy to assist you in rescheduling as soon as possible.</li>
@@ -343,9 +346,9 @@ sendSmtpEmail.htmlContent = `
 <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
 <p style="margin:0;"><strong>Christian Medical Clinic</strong></p>
-<p style="margin:0;">📞 901-5090 / 759-7116</p>
-<p style="margin:0;">📧 christianmed.inc23@yahoo.com</p>
-<p style="margin:0;">📍 22-B Madison Street, New Manila, Quezon City</p>
+<p style="margin:0;">Tel: 901-5090 / 759-7116</p>
+<p style="margin:0;">Email: christianmed.inc23@yahoo.com</p>
+<p style="margin:0;">Address: 22-B Madison Street, New Manila, Quezon City</p>
 </div>
 
 </div>
@@ -354,10 +357,10 @@ sendSmtpEmail.htmlContent = `
 
 // SEND THE EMAIL (fires for confirmed and cancelled only)
 emailApi.sendTransacEmail(sendSmtpEmail)
-.then(() => console.log(`${status.toUpperCase()} EMAIL SENT to`, email))
+.then(() => console.log(status.toUpperCase() + " EMAIL SENT to " + email))
 .catch(err => console.log("EMAIL ERROR:", err.message));
 
-return res.json({ message: `Appointment ${status} successfully.` });
+return res.json({ message: "Appointment " + status + " successfully." });
 
 } catch (err) {
 
@@ -429,5 +432,5 @@ res.status(500).json({ message: "Failed to get slot count." });
 // START SERVER
 // ------------------------
 app.listen(PORT, () => {
-console.log(`Server running on port ${PORT}`);
+console.log("Server running on port " + PORT);
 });
