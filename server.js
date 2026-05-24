@@ -16,7 +16,7 @@ rejectUnauthorized: false
 }
 });
 
-// TEST DB CONNECTION + ADD STATUS COLUMN IF NOT EXISTS
+// TEST DB CONNECTION + ADD COLUMNS IF NOT EXISTS
 (async () => {
 try {
 await db.query('SELECT 1');
@@ -27,7 +27,20 @@ await db.query(`
 ALTER TABLE appointments
 ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'new'
 `);
-console.log('Status column ready');
+
+// ADD CREATED_AT COLUMN IF IT DOESN'T EXIST YET
+await db.query(`
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()
+`);
+
+// ADD COMPLETED_AT COLUMN IF IT DOESN'T EXIST YET
+await db.query(`
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP
+`);
+
+console.log('All columns ready');
 
 } catch (err) {
 console.log('DB ERROR:', err.message);
@@ -110,11 +123,11 @@ if (parseInt(countSlot.rows[0].count) >= 12) {
 return res.json({ message: "This time slot is fully booked." });
 }
 
-// INSERT INTO DATABASE (status defaults to 'new')
+// INSERT INTO DATABASE (status defaults to 'new', created_at auto-set)
 await db.query(
 `INSERT INTO appointments
-(fullname, email, phone, service, appointment_date, time, status)
-VALUES ($1, $2, $3, $4, $5, $6, 'new')`,
+(fullname, email, phone, service, appointment_date, time, status, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, 'new', NOW())`,
 [fullname, email, phone, service, date, time]
 );
 
@@ -142,7 +155,7 @@ app.get('/appointments', async (req, res) => {
 try {
 
 const result = await db.query(
-"SELECT * FROM appointments ORDER BY appointment_date ASC, time ASC"
+"SELECT * FROM appointments ORDER BY appointment_date ASC, time ASC, created_at ASC"
 );
 
 res.json(result.rows);
