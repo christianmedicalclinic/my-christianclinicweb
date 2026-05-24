@@ -171,6 +171,25 @@ background: #6c757d;
 background: #545b62;
 }
 
+/* PRINT BUTTON */
+.print-btn {
+padding: 10px 20px;
+background: #117b0b;
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 1rem;
+cursor: pointer;
+font-weight: bold;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+
+.print-btn:hover {
+background: #0a5e08;
+}
+
 /* SERVICE FOLDER */
 .service-folder {
 margin-bottom: 15px;
@@ -325,6 +344,20 @@ margin-left: 6px;
 background: #fff3cd;
 color: #856404;
 border: 1px solid #ffc107;
+}
+
+/* FIRST BOOKED BADGE */
+.first-booked-badge {
+display: inline-block;
+font-size: 11px;
+padding: 2px 8px;
+border-radius: 20px;
+font-weight: bold;
+margin-bottom: 6px;
+margin-left: 6px;
+background: #fff0f0;
+color: #a00;
+border: 1px solid #f08080;
 }
 
 /* ACTION BUTTONS */
@@ -522,6 +555,150 @@ margin-bottom: 10px;
 border-radius: 8px;
 box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
+
+/* ========================
+   PRINT STYLES
+======================== */
+@media print {
+  /* Hide everything not needed */
+  header,
+  .tabs,
+  .search-bar,
+  .action-btns,
+  .delete-btn,
+  .confirm-btn,
+  .cancel-appt-btn,
+  .complete-btn,
+  .status-folder:not(.confirmed-folder-wrapper),
+  #completed-tab,
+  #messages-tab {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+  }
+
+  section.container {
+    max-width: 100%;
+    margin: 0;
+    padding: 10px 20px;
+  }
+
+  /* Print header shown only on print */
+  #print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #0a8f08;
+    padding-bottom: 10px;
+  }
+
+  #print-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #0a8f08;
+  }
+
+  #print-header p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: #555;
+  }
+
+  /* Show confirmed-only print table */
+  #print-confirmed-area {
+    display: block !important;
+  }
+
+  /* Hide the normal appointments div on print */
+  #appointments {
+    display: none !important;
+  }
+
+  .print-date-section {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+
+  .print-date-title {
+    background: #0a8f08;
+    color: #fff;
+    padding: 7px 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 0;
+  }
+
+  .print-service-title {
+    background: #e8f5e9;
+    color: #117b0b;
+    padding: 5px 12px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-left: 3px solid #0a8f08;
+    margin: 6px 0 4px;
+  }
+
+  .print-time-title {
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #333;
+    background: #f0f0f0;
+    margin-bottom: 2px;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+  }
+
+  .print-table th {
+    background: #d4edda;
+    color: #155724;
+    padding: 5px 8px;
+    text-align: left;
+    border: 1px solid #ccc;
+    font-size: 0.78rem;
+  }
+
+  .print-table td {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+  }
+
+  .print-table tr:nth-child(even) td {
+    background: #f9fff9;
+  }
+
+  .first-row td {
+    background: #fff8e1 !important;
+    font-weight: bold;
+  }
+
+  .first-label {
+    font-size: 10px;
+    color: #a00;
+    font-weight: bold;
+  }
+
+  h3 { display: none; }
+}
+
+/* Hide print-only elements on screen */
+#print-header {
+  display: none;
+}
+
+#print-confirmed-area {
+  display: none;
+}
 </style>
 </head>
 
@@ -553,9 +730,17 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 <input type="date" id="searchDate">
 <button onclick="searchDate()">🔍 Find</button>
 <button class="clear-btn" onclick="clearSearch()">✖ Clear</button>
+<button class="print-btn" onclick="printConfirmed()">🖨️ Print Confirmed</button>
 </div>
 
 <div id="appointments"></div>
+
+<!-- PRINT-ONLY AREA (hidden on screen, shown when printing) -->
+<div id="print-header">
+  <h2>📋 Confirmed Appointments</h2>
+  <p id="print-subtitle"></p>
+</div>
+<div id="print-confirmed-area"></div>
 
 </div>
 
@@ -564,10 +749,8 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 <h3>Completed Services</h3>
 
-<!-- SUMMARY CARDS -->
 <div class="completed-summary" id="completed-summary"></div>
 
-<!-- SEARCH FOR COMPLETED -->
 <div class="search-bar">
 <input type="text" id="completedSearch" placeholder="Search by name or service..." oninput="filterCompleted()">
 <button class="clear-btn" onclick="clearCompletedSearch()">✖ Clear</button>
@@ -741,7 +924,6 @@ function renderAppointments(appointments, filterDate) {
 
 let container = document.getElementById("appointments");
 
-// Exclude completed from this view
 const activeAppointments = appointments.filter(a => (a.status || 'new') !== 'completed');
 
 if (activeAppointments.length === 0) {
@@ -788,7 +970,6 @@ header.innerHTML = `
 
 section.appendChild(header);
 
-// DELETE ALL BUTTON
 let deleteAllBtn = document.createElement("button");
 deleteAllBtn.className = "delete-btn";
 deleteAllBtn.textContent = "Delete All";
@@ -811,7 +992,6 @@ header.appendChild(deleteAllBtn);
 let content = document.createElement("div");
 content.className = "date-content";
 
-// GROUP BY SERVICE
 let groupedByService = {};
 groupedByDate[date].forEach(app => {
 const serviceName = app.service || "Unknown Service";
@@ -819,7 +999,6 @@ if (!groupedByService[serviceName]) groupedByService[serviceName] = [];
 groupedByService[serviceName].push(app);
 });
 
-// LOOP THROUGH SERVICES
 Object.keys(groupedByService).sort().forEach(service => {
 
 let serviceFolder = document.createElement("div");
@@ -836,7 +1015,6 @@ serviceFolder.appendChild(serviceHeader);
 let serviceContent = document.createElement("div");
 serviceContent.className = "service-content";
 
-// STATUS SUB-FOLDERS: new, confirmed, cancelled
 const statusList = [
 { key: 'new', label: '🆕 New Appointments' },
 { key: 'confirmed', label: '✅ Confirmed Appointments' },
@@ -865,7 +1043,6 @@ if (statusAppts.length === 0) {
 statusContent.innerHTML = `<p style="color:#888;font-size:13px;">No ${key} appointments.</p>`;
 } else {
 
-// GROUP BY TIME WITHIN STATUS
 let groupedByTime = {};
 statusAppts.forEach(app => {
 if (!groupedByTime[app.time]) groupedByTime[app.time] = [];
@@ -873,6 +1050,11 @@ groupedByTime[app.time].push(app);
 });
 
 Object.keys(groupedByTime).sort().forEach(time => {
+
+// Sort by created_at so first booked is index 0
+const sortedByBookedTime = groupedByTime[time].slice().sort((a, b) => {
+return new Date(a.created_at) - new Date(b.created_at);
+});
 
 let timeFolder = document.createElement("div");
 timeFolder.className = "time-folder";
@@ -888,15 +1070,17 @@ timeFolder.appendChild(timeHeader);
 let timeContent = document.createElement("div");
 timeContent.className = "time-content";
 
-groupedByTime[time].forEach(app => {
+sortedByBookedTime.forEach((app, idx) => {
 let div = document.createElement("div");
 div.className = "msg-box";
 
 const appStatus = app.status || 'new';
+const isFirst = idx === 0;
 
 div.innerHTML = `
 <span class="status-badge ${appStatus}">${appStatus.charAt(0).toUpperCase() + appStatus.slice(1)}</span>
 <span class="booked-on">📋 Booked on: ${formatBookedOn(app.created_at)}</span>
+${isFirst ? '<span class="first-booked-badge">🥇 First to book</span>' : ''}
 <p><strong>Name:</strong> ${app.fullname}</p>
 <p><strong>Email:</strong> ${app.email}</p>
 <p><strong>Phone:</strong> ${app.phone}</p>
@@ -906,7 +1090,6 @@ div.innerHTML = `
 let actionRow = document.createElement("div");
 actionRow.className = "action-btns";
 
-// NEW: show Confirm + Cancel
 if (appStatus === 'new') {
 let confirmBtn = document.createElement("button");
 confirmBtn.className = "confirm-btn";
@@ -921,7 +1104,6 @@ cancelBtn.onclick = () => cancelAppointment(app.id);
 actionRow.appendChild(cancelBtn);
 }
 
-// CONFIRMED: show Completed button
 if (appStatus === 'confirmed') {
 let completeBtn = document.createElement("button");
 completeBtn.className = "complete-btn";
@@ -930,7 +1112,6 @@ completeBtn.onclick = () => completeAppointment(app.id);
 actionRow.appendChild(completeBtn);
 }
 
-// ALL: Delete button
 let deleteBtn = document.createElement("button");
 deleteBtn.className = "delete-btn";
 deleteBtn.textContent = "Delete";
@@ -1009,6 +1190,106 @@ console.log(error);
 
 
 /* =========================
+PRINT CONFIRMED
+========================= */
+function printConfirmed() {
+  const filterDate = document.getElementById("searchDate").value || null;
+
+  // Get only confirmed, non-completed appointments
+  let confirmed = allAppointments.filter(a => (a.status || 'new') === 'confirmed');
+
+  // If a date filter is active, narrow it down
+  if (filterDate) {
+    confirmed = confirmed.filter(a => {
+      const d = new Date(a.appointment_date);
+      const local = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+      return local === filterDate;
+    });
+  }
+
+  if (confirmed.length === 0) {
+    alert("No confirmed appointments to print" + (filterDate ? " for this date." : "."));
+    return;
+  }
+
+  // Group by date → service → time
+  const byDate = {};
+  confirmed.forEach(app => {
+    const date = app.appointment_date;
+    if (!byDate[date]) byDate[date] = {};
+    const svc = app.service || 'Unknown Service';
+    if (!byDate[date][svc]) byDate[date][svc] = {};
+    if (!byDate[date][svc][app.time]) byDate[date][svc][app.time] = [];
+    byDate[date][svc][app.time].push(app);
+  });
+
+  // Sort each time slot by created_at so first booked = index 0
+  Object.keys(byDate).forEach(date => {
+    Object.keys(byDate[date]).forEach(svc => {
+      Object.keys(byDate[date][svc]).forEach(time => {
+        byDate[date][svc][time].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      });
+    });
+  });
+
+  // Build print HTML
+  const printArea = document.getElementById("print-confirmed-area");
+  const subtitle = document.getElementById("print-subtitle");
+
+  const dateLabel = filterDate
+    ? formatDate(filterDate + 'T00:00:00')
+    : "All Dates";
+  const now = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
+  subtitle.textContent = `Date: ${dateLabel}  |  Printed on: ${now}`;
+
+  let html = "";
+
+  Object.keys(byDate).sort().forEach(date => {
+    html += `<div class="print-date-section">`;
+    html += `<div class="print-date-title">📅 ${formatDate(date)}</div>`;
+
+    Object.keys(byDate[date]).sort().forEach(svc => {
+      html += `<div class="print-service-title">📁 ${svc}</div>`;
+
+      Object.keys(byDate[date][svc]).sort().forEach(time => {
+        const patients = byDate[date][svc][time];
+        html += `<div class="print-time-title">🕐 ${formatTime(time)} — ${patients.length} confirmed</div>`;
+        html += `<table class="print-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Booked On</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+        patients.forEach((app, idx) => {
+          const isFirst = idx === 0;
+          html += `<tr class="${isFirst ? 'first-row' : ''}">
+            <td>${idx + 1}${isFirst ? '<br><span class="first-label">🥇 First</span>' : ''}</td>
+            <td>${app.fullname}</td>
+            <td>${app.phone}</td>
+            <td>${app.email}</td>
+            <td>${formatBookedOn(app.created_at)}</td>
+          </tr>`;
+        });
+
+        html += `</tbody></table>`;
+      });
+    });
+
+    html += `</div>`;
+  });
+
+  printArea.innerHTML = html;
+  window.print();
+}
+
+
+/* =========================
 COMPLETED SERVICES
 ========================= */
 
@@ -1065,7 +1346,6 @@ function renderCompleted(data) {
 const listEl = document.getElementById("completed-list");
 const summaryEl = document.getElementById("completed-summary");
 
-// SUMMARY CARDS
 const totalCount = data.length;
 const serviceMap = {};
 data.forEach(a => {
@@ -1097,7 +1377,6 @@ return;
 
 listEl.innerHTML = "";
 
-// GROUP BY SERVICE
 const groupedByService = {};
 data.forEach(app => {
 const s = app.service || 'Unknown Service';
@@ -1105,7 +1384,6 @@ if (!groupedByService[s]) groupedByService[s] = [];
 groupedByService[s].push(app);
 });
 
-// SORT SERVICES ALPHABETICALLY
 Object.keys(groupedByService).sort().forEach(service => {
 
 const appts = groupedByService[service];
@@ -1125,7 +1403,6 @@ let fContent = document.createElement("div");
 fContent.className = "completed-service-content";
 fContent.style.display = "block";
 
-// GROUP BY DATE WITHIN SERVICE
 const groupedByDate = {};
 appts.forEach(app => {
 const d = app.appointment_date;
@@ -1133,7 +1410,6 @@ if (!groupedByDate[d]) groupedByDate[d] = [];
 groupedByDate[d].push(app);
 });
 
-// SORT DATES DESCENDING (most recent first)
 Object.keys(groupedByDate).sort().reverse().forEach(date => {
 
 const dateAppts = groupedByDate[date];
@@ -1186,7 +1462,6 @@ fContent.style.display = fContent.style.display === "none" ? "block" : "none";
 });
 }
 
-// LOAD APPOINTMENTS ON START
 loadAppointments();
 
 </script>
