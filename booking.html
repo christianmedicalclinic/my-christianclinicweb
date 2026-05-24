@@ -144,6 +144,12 @@ color:#888;
 border:1px solid #ddd;
 }
 
+.slot-info.past{
+background:#fff3e0;
+color:#e65100;
+border:1px solid #ffcc80;
+}
+
 @media (max-width:900px){
 .container{
 flex-direction: column;
@@ -247,108 +253,197 @@ const slotInfo = document.getElementById('slot-info');
 const submitBtn = document.getElementById('submitBtn');
 
 // ------------------------
+// SET MIN DATE TO TODAY (Manila time)
+// Blocks selecting past dates on the date picker
+// ------------------------
+function getTodayManila() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+}
+
+dateInput.min = getTodayManila();
+
+// ------------------------
+// CHECK IF SELECTED DATE+TIME IS IN THE PAST (Manila time)
+// ------------------------
+function isTimePast(date, time) {
+  if (!date || !time) return false;
+
+  // Get current Manila date and time
+  const nowManila = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+
+  // Build the selected datetime in Manila time
+  const [hour, minute] = time.split(':');
+  const [year, month, day] = date.split('-');
+  const selectedDateTime = new Date(year, month - 1, day, parseInt(hour), parseInt(minute), 0);
+
+  return selectedDateTime <= nowManila;
+}
+
+// ------------------------
+// FILTER OUT PAST TIME SLOTS WHEN TODAY IS SELECTED
+// ------------------------
+function updateTimeOptions() {
+  const selectedDate = dateInput.value;
+  const todayManila = getTodayManila();
+  const allOptions = timeInput.querySelectorAll('option');
+
+  allOptions.forEach(option => {
+    if (!option.value) return; // skip the placeholder
+    if (selectedDate === todayManila) {
+      // Hide/disable times that have already passed
+      if (isTimePast(selectedDate, option.value)) {
+        option.disabled = true;
+        option.style.color = '#bbb';
+      } else {
+        option.disabled = false;
+        option.style.color = '';
+      }
+    } else {
+      // Future date — enable all times
+      option.disabled = false;
+      option.style.color = '';
+    }
+  });
+
+  // If currently selected time is now disabled, reset it
+  if (timeInput.value && timeInput.options[timeInput.selectedIndex].disabled) {
+    timeInput.value = '';
+    slotInfo.style.display = 'none';
+    submitBtn.disabled = false;
+  }
+}
+
+// ------------------------
 // CHECK SLOT AVAILABILITY
 // ------------------------
 async function checkSlot() {
-const date = dateInput.value;
-const time = timeInput.value;
+  const date = dateInput.value;
+  const time = timeInput.value;
 
-if (!date || !time) {
-slotInfo.style.display = 'none';
-return;
+  if (!date || !time) {
+    slotInfo.style.display = 'none';
+    return;
+  }
+
+  // Block past date+time combinations
+  if (isTimePast(date, time)) {
+    slotInfo.style.display = 'block';
+    slotInfo.className = 'slot-info past';
+    slotInfo.textContent = '⛔ This time slot has already passed. Please select a future time.';
+    submitBtn.disabled = true;
+    return;
+  }
+
+  slotInfo.style.display = 'block';
+  slotInfo.className = 'slot-info loading';
+  slotInfo.textContent = 'Checking availability...';
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch(`/slot-count?date=${date}&time=${time}`);
+    const data = await res.json();
+
+    if (data.remaining <= 0) {
+      slotInfo.className = 'slot-info full';
+      slotInfo.textContent = `⛔ This slot is fully booked (${data.booked}/${data.max} slots taken).`;
+      submitBtn.disabled = true;
+    } else {
+      slotInfo.className = 'slot-info available';
+      slotInfo.textContent = `✅ ${data.booked} out of ${data.max} slots taken — ${data.remaining} slot(s) still available.`;
+      submitBtn.disabled = false;
+    }
+
+  } catch (err) {
+    slotInfo.style.display = 'none';
+    submitBtn.disabled = false;
+    console.error('Slot check error:', err);
+  }
 }
 
-slotInfo.style.display = 'block';
-slotInfo.className = 'slot-info loading';
-slotInfo.textContent = 'Checking availability...';
-submitBtn.disabled = true;
+dateInput.addEventListener('change', () => {
+  updateTimeOptions();
+  checkSlot();
+});
 
-try {
-const res = await fetch(`/slot-count?date=${date}&time=${time}`);
-const data = await res.json();
-
-if (data.remaining <= 0) {
-slotInfo.className = 'slot-info full';
-slotInfo.textContent = `⛔ This slot is fully booked (${data.booked}/${data.max} slots taken).`;
-submitBtn.disabled = true;
-} else {
-slotInfo.className = 'slot-info available';
-slotInfo.textContent = `✅ ${data.booked} out of ${data.max} slots taken — ${data.remaining} slot(s) still available.`;
-submitBtn.disabled = false;
-}
-
-} catch (err) {
-slotInfo.style.display = 'none';
-submitBtn.disabled = false;
-console.error('Slot check error:', err);
-}
-}
-
-dateInput.addEventListener('change', checkSlot);
 timeInput.addEventListener('change', checkSlot);
+
+// Run on load to disable past times if today is already selected
+updateTimeOptions();
 
 // ------------------------
 // SUBMIT BOOKING
 // ------------------------
 form.addEventListener('submit', async function(e) {
 
-e.preventDefault();
+  e.preventDefault();
 
-messageDiv.style.color = "black";
-messageDiv.textContent = "Booking appointment...";
+  const date = dateInput.value;
+  const time = timeInput.value;
 
-const formData = new FormData(form);
+  // Double-check on submit in case they bypassed the UI
+  if (isTimePast(date, time)) {
+    messageDiv.style.color = 'red';
+    messageDiv.textContent = '⛔ This time slot has already passed. Please select a future time.';
+    return;
+  }
 
-const data = {
-fullname: formData.get('fullname'),
-email: formData.get('email'),
-phone: formData.get('phone'),
-service: formData.get('service'),
-date: formData.get('date'),
-time: formData.get('time')
-};
+  messageDiv.style.color = "black";
+  messageDiv.textContent = "Booking appointment...";
 
-console.log("Sending:", data);
+  const formData = new FormData(form);
 
-try {
+  const data = {
+    fullname: formData.get('fullname'),
+    email: formData.get('email'),
+    phone: formData.get('phone'),
+    service: formData.get('service'),
+    date: formData.get('date'),
+    time: formData.get('time')
+  };
 
-const response = await fetch('/book-appointment', {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify(data)
-});
+  console.log("Sending:", data);
 
-const result = await response.json();
+  try {
 
-console.log("SERVER RESPONSE:", result);
+    const response = await fetch('/book-appointment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
 
-messageDiv.textContent = result.message;
+    const result = await response.json();
 
-if (response.ok) {
+    console.log("SERVER RESPONSE:", result);
 
-messageDiv.style.color = "green";
+    messageDiv.textContent = result.message;
 
-form.reset();
-slotInfo.style.display = 'none';
-submitBtn.disabled = false;
+    if (response.ok) {
 
-} else {
+      messageDiv.style.color = "green";
 
-messageDiv.style.color = "red";
+      form.reset();
+      slotInfo.style.display = 'none';
+      submitBtn.disabled = false;
+      dateInput.min = getTodayManila();
+      updateTimeOptions();
 
-}
+    } else {
 
-} catch (error) {
+      messageDiv.style.color = "red";
 
-console.log("FETCH ERROR:", error);
+    }
 
-messageDiv.style.color = "red";
+  } catch (error) {
 
-messageDiv.textContent = "Cannot connect to server";
+    console.log("FETCH ERROR:", error);
 
-}
+    messageDiv.style.color = "red";
+
+    messageDiv.textContent = "Cannot connect to server";
+
+  }
 
 });
 </script>
