@@ -326,45 +326,28 @@ function autoReply(message) {
         typeof r.reply !== "object" // exclude general inquiries
     );
 
-    // Exact match
-    ```javascript id="y2m7qx"
-// Match keywords even if inside a sentence
-const exactMatch = serviceReplies.find(r =>
+    ```javascript id="x3q9vm"
+// Match keywords even inside long sentences
+const matchedReply = serviceReplies.find(r =>
     r.keywords.some(k =>
         msg.includes(k.toLowerCase()) ||
         k.toLowerCase().includes(msg)
     )
 );
 
-if (exactMatch) {
-    const r = exactMatch;
-
+if (matchedReply) {
     addBotMessage(
-        typeof r.reply === "object"
-            ? (currentLang === "tl" ? r.reply.tl : r.reply.en)
-            : r.reply
+        typeof matchedReply.reply === "object"
+            ? (currentLang === "tl"
+                ? matchedReply.reply.tl
+                : matchedReply.reply.en)
+            : matchedReply.reply
     );
 
     return;
 }
+```
 
-// Partial match
-const partialMatches = serviceReplies.filter(r =>
-    r.keywords.some(k =>
-        msg.includes(k.toLowerCase()) ||
-        k.toLowerCase().includes(msg)
-    )
-);
-        return;
-    }
-    if (partialMatches.length > 1) {
-        const options = partialMatches.map(r => r.keywords[0]).filter((v,i,a)=>a.indexOf(v)===i).join(', ');
-        addBotMessage(currentLang === "tl"
-            ? `Pakispecify ang serbisyo. Mga options: ${options}`
-            : `Please specify which service you mean. Options: ${options}`
-        );
-        return;
-    }
 
     // Price inquiry fallback
     if (message.toLowerCase().includes('magkano') || message.toLowerCase().includes('price') || message.toLowerCase().includes('cost')) {
