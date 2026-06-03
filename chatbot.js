@@ -285,10 +285,7 @@ function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
     // Remove "magkano ang" or "how much is"
-    msg = msg.replace(
-  /^(magkano ang|how much is|meron ba kayong|do you have|do you offer|available ba|mayroon ba kayong)\s+/i,
-  ''
-);
+    msg = msg.replace(/magkano ang\s+/i, '').replace(/how much is\s+/i, '');
 
     // Alias map for shorthand typing
     const aliasMap = {
@@ -326,27 +323,35 @@ function autoReply(message) {
         typeof r.reply !== "object" // exclude general inquiries
     );
 
- ```javascript id="u8p2zs"
-// Match any keyword inside the sentence
-for (const r of serviceReplies) {
-    for (const keyword of r.keywords) {
-
-        if (msg.includes(keyword.toLowerCase())) {
-
-            addBotMessage(
-                typeof r.reply === "object"
-                    ? (currentLang === "tl"
-                        ? r.reply.tl
-                        : r.reply.en)
-                    : r.reply
-            );
-
-            return;
-        }
+    // Exact match
+    const exactMatch = serviceReplies.find(r => r.keywords.some(k => k.toLowerCase() === msg));
+    if (exactMatch) {
+        const r = exactMatch;
+        addBotMessage(typeof r.reply === "object"
+            ? (currentLang === "tl" ? r.reply.tl : r.reply.en)
+            : r.reply
+        );
+        return;
     }
-}
-```
 
+    // Partial match
+    const partialMatches = serviceReplies.filter(r => r.keywords.some(k => k.toLowerCase().includes(msg)));
+    if (partialMatches.length === 1) {
+        const r = partialMatches[0];
+        addBotMessage(typeof r.reply === "object"
+            ? (currentLang === "tl" ? r.reply.tl : r.reply.en)
+            : r.reply
+        );
+        return;
+    }
+    if (partialMatches.length > 1) {
+        const options = partialMatches.map(r => r.keywords[0]).filter((v,i,a)=>a.indexOf(v)===i).join(', ');
+        addBotMessage(currentLang === "tl"
+            ? `Pakispecify ang serbisyo. Mga options: ${options}`
+            : `Please specify which service you mean. Options: ${options}`
+        );
+        return;
+    }
 
     // Price inquiry fallback
     if (message.toLowerCase().includes('magkano') || message.toLowerCase().includes('price') || message.toLowerCase().includes('cost')) {
