@@ -1,4 +1,3 @@
-
 const chatbox = document.querySelector('.chatbot');
 const chatHeader = chatbox.querySelector('.chat-header');
 const chatBody = chatbox.querySelector('.chat-body');
@@ -307,8 +306,14 @@ addBotMessage(currentLang === "tl" ? exactGeneral.reply.tl : exactGeneral.reply.
 return;
 }
 
-// Partial match for general inquiries (msg contains keyword)
-const partialGeneral = generalReplies.filter(r => r.keywords.some(k => msg.includes(k.toLowerCase())));
+// Partial match for general inquiries (word boundary match)
+const partialGeneral = generalReplies.filter(r =>
+r.keywords.some(k => {
+const escaped = k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const regex = new RegExp(`(?<![a-z0-9])${escaped}(?![a-z0-9])`, 'i');
+return regex.test(msg);
+})
+);
 if (partialGeneral.length === 1) {
 addBotMessage(currentLang === "tl" ? partialGeneral[0].reply.tl : partialGeneral[0].reply.en);
 return;
@@ -342,9 +347,13 @@ addBotMessage(typeof r.reply === "object"
 return;
 }
 
-// Partial match — FIXED: check if msg contains the keyword (not the other way around)
+// Partial match — word boundary regex so short keywords don't false-match inside other words
 const partialMatches = serviceReplies.filter(r =>
-r.keywords.some(k => msg.includes(k.toLowerCase()))
+r.keywords.some(k => {
+const escaped = k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const regex = new RegExp(`(?<![a-z0-9])${escaped}(?![a-z0-9])`, 'i');
+return regex.test(msg);
+})
 );
 
 if (partialMatches.length === 1) {
