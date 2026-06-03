@@ -299,8 +299,11 @@ function autoReply(message) {
        .replace(/pwede bang magtanong magkano\s+/i, '')
        .replace(/magkano ang inyong\s+/i, '')
        .replace(/available\s+/i, '')
-       .replace(/hm ang \s+/i, '')
+       .replace(/hm ang\s+/i, '')
        .replace(/do you offer\s+/i, '')
+       .replace(/available ba ang\s+/i, '')
+       
+       
       
        ;
 
