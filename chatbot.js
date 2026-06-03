@@ -307,8 +307,6 @@ function autoReply(message) {
        .replace(/do you offer\s+/i, '')
        .replace(/available ba ang\s+/i, '')
        
-       
-      
        ;
 
     // Alias map for shorthand typing
