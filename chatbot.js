@@ -285,7 +285,13 @@ function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
     // Remove "magkano ang" or "how much is"
-    msg = msg.replace(/magkano ang\s+/i, '').replace(/how much is\s+/i, '');
+    if (
+  msg.toLowerCase().includes("magkano") ||
+  msg.toLowerCase().includes("how much") ||
+  msg.toLowerCase().includes("price")
+) {
+  // reply here
+}
 
     // Alias map for shorthand typing
     const aliasMap = {
