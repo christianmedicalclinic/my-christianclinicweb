@@ -327,24 +327,36 @@ function autoReply(message) {
     );
 
     // Exact match
-    const exactMatch = serviceReplies.find(r => r.keywords.some(k => k.toLowerCase() === msg));
-    if (exactMatch) {
-        const r = exactMatch;
-        addBotMessage(typeof r.reply === "object"
-            ? (currentLang === "tl" ? r.reply.tl : r.reply.en)
-            : r.reply
-        );
-        return;
-    }
+    ```javascript id="y2m7qx"
+// Match keywords even if inside a sentence
+const exactMatch = serviceReplies.find(r =>
+    r.keywords.some(k =>
+        msg.includes(k.toLowerCase()) ||
+        k.toLowerCase().includes(msg)
+    )
+);
 
-    // Partial match
-    const partialMatches = serviceReplies.filter(r => r.keywords.some(k => k.toLowerCase().includes(msg)));
-    if (partialMatches.length === 1) {
-        const r = partialMatches[0];
-        addBotMessage(typeof r.reply === "object"
+if (exactMatch) {
+    const r = exactMatch;
+
+    addBotMessage(
+        typeof r.reply === "object"
             ? (currentLang === "tl" ? r.reply.tl : r.reply.en)
             : r.reply
-        );
+    );
+
+    return;
+}
+
+// Partial match
+const partialMatches = serviceReplies.filter(r =>
+    r.keywords.some(k =>
+        msg.includes(k.toLowerCase()) ||
+        k.toLowerCase().includes(msg)
+    )
+);
+```
+
         return;
     }
     if (partialMatches.length > 1) {
