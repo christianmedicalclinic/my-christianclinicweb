@@ -3,11 +3,7 @@ const chatHeader = chatbox.querySelector('.chat-header');
 const chatBody = chatbox.querySelector('.chat-body');
 const chatInput = chatbox.querySelector('#chat-input');
 
-
-
-
 let isCollapsed = false;
-
 
 // Predefined auto-replies
 const autoReplies = [
@@ -133,7 +129,7 @@ const autoReplies = [
     { keywords: ['hiv screening','hiv'], reply: '₱850.00' },
     { keywords: ['hiv w/ titer'], reply: '₱900.00' },
     { keywords: ['hsv 1'], reply: '₱1,800.00' },
-    { keywords: ['hsv 2'], reply: '₱1 ,500.00' },
+    { keywords: ['hsv 2'], reply: '₱1,500.00' },
     { keywords: ['hepatitis a profile'], reply: '₱1,200.00' },
     { keywords: ['hepatitis a and b profile'], reply: '₱2,500.00' },
     { keywords: ['hepatitis a,b and c profile'], reply: '₱3,000.00' },
@@ -235,9 +231,7 @@ const autoReplies = [
     { keywords: ['widal test'], reply: '₱600.00' },
     { keywords: ['x-ray ap/lat right ankle'], reply: '₱950.00' },
     { keywords: ['x-ray apolordotic view','apico','APICO','Apico'], reply: '₱550.00' },
-
 ];
-
 
 const defaultReplies = [
     'Hello! How can we assist you today?',
@@ -284,43 +278,166 @@ document.addEventListener('mousemove', (e) => {
 function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
-    // Remove "magkano ang" or "how much is"
-    msg = msg.replace(/magkano ang\s+/i, '').replace(/how much is\s+/i, '');
+    // Remove common filler phrases before keyword matching
+    msg = msg
+        .replace(/magkano ang\s+/i, '')
+        .replace(/how much is\s+/i, '')
+        .replace(/do you have\s+/i, '')
+        .replace(/do you offer\s+/i, '')
+        .replace(/mayroon ba kayong\s+/i, '')
+        .replace(/mayroon kayong\s+/i, '')
+        .replace(/meron ba kayong\s+/i, '')
+        .replace(/meron kayong\s+/i, '')
+        .replace(/may\s+ba kayo\s*/i, '')
+        .replace(/available ba ang\s+/i, '')
+        .replace(/available ang\s+/i, '')
+        .replace(/ano ang presyo ng\s+/i, '')
+        .replace(/what is the price of\s+/i, '')
+        .trim();
 
-    // Alias map for shorthand typing
+    // Alias map — groups of related services
     const aliasMap = {
-        "xray": ["chest x-ray", "chest x-ray vdr", "chest x-ray ap/lat"]
+        "xray": {
+            services: ["Chest X-ray", "Chest X-ray VDR", "Chest X-ray AP/Lat", "X-ray AP/Lat Right Ankle", "X-ray Apico Lordotic View"],
+            message: { en: "We offer the following X-ray services. Type the exact name for the price:", tl: "Mga X-ray services namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "x-ray": {
+            services: ["Chest X-ray", "Chest X-ray VDR", "Chest X-ray AP/Lat", "X-ray AP/Lat Right Ankle", "X-ray Apico Lordotic View"],
+            message: { en: "We offer the following X-ray services. Type the exact name for the price:", tl: "Mga X-ray services namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "ultrasound": {
+            services: ["Abdominal Ultrasound", "Breast Ultrasound", "Hepato Biliary Ultrasound", "KUB Ultrasound", "Prostate Ultrasound"],
+            message: { en: "We offer the following Ultrasound services. Type the exact name for the price:", tl: "Mga Ultrasound services namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "ecg": {
+            services: ["ECG — ₱350.00"],
+            message: { en: "We offer ECG. Type 'ECG' to get the price.", tl: "Mayroon kaming ECG. I-type ang 'ECG' para sa presyo." }
+        },
+        "blood": {
+            services: ["CBC", "ABO Blood Typing", "RH Factor", "Platelet Count", "Reticulocyte Count", "Peripheral Blood Sugar", "Cell and Differential Count"],
+            message: { en: "We offer the following blood tests. Type the exact name for the price:", tl: "Mga blood tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "hepatitis": {
+            services: ["Hepatitis A Profile", "Hepatitis B Profile", "Hepatitis A and B Profile", "Hepatitis A,B and C Profile", "HBsAg Screening", "HBsAg with Titer", "Anti-HBs", "Anti-HCV", "Anti-HAV", "Anti-HAV IgG", "HBeAg"],
+            message: { en: "We offer the following Hepatitis tests. Type the exact name for the price:", tl: "Mga Hepatitis tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "thyroid": {
+            services: ["TSH", "T3", "T4", "FT3", "FT4"],
+            message: { en: "We offer the following Thyroid tests. Type the exact name for the price:", tl: "Mga Thyroid tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "hormone": {
+            services: ["FSH", "LH", "Estradiol", "Progesterone", "Prolactin", "Testosterone", "Cortisol"],
+            message: { en: "We offer the following Hormone tests. Type the exact name for the price:", tl: "Mga Hormone tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "dengue": {
+            services: ["Dengue IgA", "Dengue IgM and IgG", "Dengue NSI"],
+            message: { en: "We offer the following Dengue tests. Type the exact name for the price:", tl: "Mga Dengue tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "drug": {
+            services: ["Drug and Alcohol Test", "Cocaine Test", "Tetrahyrocannabinol", "PSC Drug Test"],
+            message: { en: "We offer the following Drug tests. Type the exact name for the price:", tl: "Mga Drug tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "cancer": {
+            services: ["CA-125", "CA-153", "CA-199", "CEA", "PSA", "AFP", "B-hCG"],
+            message: { en: "We offer the following Tumor Marker tests. Type the exact name for the price:", tl: "Mga Tumor Marker tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "tumor": {
+            services: ["CA-125", "CA-153", "CA-199", "CEA", "PSA", "AFP", "B-hCG"],
+            message: { en: "We offer the following Tumor Marker tests. Type the exact name for the price:", tl: "Mga Tumor Marker tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "urine": {
+            services: ["Urinalysis", "Pregnancy Test Urine", "Micro Albumin Test", "Urobilinogen", "Occult Blood", "Ketone/Acetone"],
+            message: { en: "We offer the following Urine tests. Type the exact name for the price:", tl: "Mga Urine tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "pregnancy": {
+            services: ["Pregnancy Test Serum", "Pregnancy Test Urine", "B-hCG"],
+            message: { en: "We offer the following Pregnancy tests. Type the exact name for the price:", tl: "Mga Pregnancy tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "dental": {
+            services: ["Check-up", "Please call us at +123-456-7890 for the full dental services list."],
+            message: { en: "We offer Dental services. Here are some options:", tl: "Mayroon kaming Dental services. Narito ang ilan:" }
+        },
+        "physical": {
+            services: ["Physical Exam — ₱100.00", "Check-up — ₱500.00"],
+            message: { en: "We offer the following Physical Exam services:", tl: "Mga Physical Exam services namin:" }
+        },
+        "package": {
+            services: ["PSC Regular", "PSC Drug Test", "Basic Blood Chemistry", "Basic 4", "Basic 5", "Package"],
+            message: { en: "We offer the following packages. Type the exact name for the price:", tl: "Mga packages namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "shipping": {
+            services: ["Ankor Hong Kong", "Ankor Poland", "Marsun Shipping", "Creamship Management", "NIR Romania Female", "NIR Romania Male", "NIR Singapore Hong Kong", "Jensen", "Seabuoy Crewing DAAT Package 1", "Seabuoy Crewing DAAT Package 2", "Seabuoy Crewing Italian Med"],
+            message: { en: "We offer the following Seafarer/Shipping packages. Type the exact name for the price:", tl: "Mga Seafarer/Shipping packages namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "seafarer": {
+            services: ["Ankor Hong Kong", "Ankor Poland", "Marsun Shipping", "Creamship Management", "NIR Romania Female", "NIR Romania Male", "NIR Singapore Hong Kong", "Jensen", "Seabuoy Crewing DAAT Package 1", "Seabuoy Crewing DAAT Package 2", "Seabuoy Crewing Italian Med"],
+            message: { en: "We offer the following Seafarer packages. Type the exact name for the price:", tl: "Mga Seafarer packages namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "stress": {
+            services: ["Stress Test — ₱2,000.00"],
+            message: { en: "We offer Stress Test. Type 'Stress Test' to get the price.", tl: "Mayroon kaming Stress Test. I-type ang 'Stress Test' para sa presyo." }
+        },
+        "audiometry": {
+            services: ["Audiometry — ₱200.00"],
+            message: { en: "We offer Audiometry. Type 'Audiometry' to get the price.", tl: "Mayroon kaming Audiometry. I-type ang 'Audiometry' para sa presyo." }
+        },
+        "optical": {
+            services: ["Ishihara Test (Color Blindness) — ₱50.00"],
+            message: { en: "We offer the following Optical services:", tl: "Mga Optical services namin:" }
+        },
+        "culture": {
+            services: ["Culture and Sensitivity", "Culture Only", "MTB Culture"],
+            message: { en: "We offer the following Culture tests. Type the exact name for the price:", tl: "Mga Culture tests namin. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "pap": {
+            services: ["Pap Smear — ₱500.00"],
+            message: { en: "We offer Pap Smear. Type 'Pap Smear' to get the price.", tl: "Mayroon kaming Pap Smear. I-type ang 'Pap Smear' para sa presyo." }
+        },
+        "semen": {
+            services: ["Semen Analysis — ₱550.00"],
+            message: { en: "We offer Semen Analysis. Type 'Semen Analysis' to get the price.", tl: "Mayroon kaming Semen Analysis. I-type ang 'Semen Analysis' para sa presyo." }
+        },
+        "lab": {
+            services: ["CBC", "Urinalysis", "FBS", "Lipid Profile", "HBA1C", "Creatinine Only", "SGPT/ALT", "SGOT/AST", "Uric Acid", "Cholesterol", "BUN", "...and many more"],
+            message: { en: "We offer many lab tests. Here are some common ones. Type the exact test name for the price:", tl: "Marami kaming lab tests. Narito ang ilan. I-type ang eksaktong pangalan para sa presyo:" }
+        },
+        "laboratory": {
+            services: ["CBC", "Urinalysis", "FBS", "Lipid Profile", "HBA1C", "Creatinine Only", "SGPT/ALT", "SGOT/AST", "Uric Acid", "Cholesterol", "BUN", "...and many more"],
+            message: { en: "We offer many lab tests. Here are some common ones. Type the exact test name for the price:", tl: "Marami kaming lab tests. Narito ang ilan. I-type ang eksaktong pangalan para sa presyo:" }
+        }
     };
 
-    // --- 1️⃣ Check general inquiries first ---
-    const generalReplies = autoReplies.filter(r => typeof r.reply === "object"); // only general inquiries
+    // --- 1. Check general inquiries first ---
+    const generalReplies = autoReplies.filter(r => typeof r.reply === "object");
     const exactGeneral = generalReplies.find(r => r.keywords.some(k => k.toLowerCase() === msg));
     if (exactGeneral) {
         addBotMessage(currentLang === "tl" ? exactGeneral.reply.tl : exactGeneral.reply.en);
         return;
     }
-    // Partial match for general inquiries (e.g., "saan location")
     const partialGeneral = generalReplies.filter(r => r.keywords.some(k => msg.includes(k.toLowerCase())));
     if (partialGeneral.length === 1) {
         addBotMessage(currentLang === "tl" ? partialGeneral[0].reply.tl : partialGeneral[0].reply.en);
         return;
     }
 
-    // --- 2️⃣ Alias map ---
-    if (aliasMap[msg]) {
+    // --- 2. Alias map check (partial match — works even with extra words) ---
+    const matchedAlias = Object.keys(aliasMap).find(alias => msg.includes(alias));
+    if (matchedAlias) {
+        const aliasData = aliasMap[matchedAlias];
+        const serviceList = aliasData.services.join('\n• ');
         addBotMessage(currentLang === "tl"
-            ? `Pakispecify ang serbisyo. Mga options: ${aliasMap[msg].join(', ')}`
-            : `Please specify which service you mean. Options: ${aliasMap[msg].join(', ')}`
+            ? `${aliasData.message.tl}\n\n• ${serviceList}`
+            : `${aliasData.message.en}\n\n• ${serviceList}`
         );
         return;
     }
 
-    // --- 3️⃣ Service / price matching ---
+    // --- 3. Service / price matching ---
     const serviceReplies = autoReplies.filter(r =>
         !r.keywords.includes('price') &&
         !r.keywords.includes('cost') &&
         !r.keywords.includes('presyo') &&
-        typeof r.reply !== "object" // exclude general inquiries
+        typeof r.reply !== "object"
     );
 
     // Exact match
@@ -364,11 +481,11 @@ function autoReply(message) {
 
     // Default fallback
     addBotMessage(currentLang === "tl"
-        ? "Paumanhin, ang serbisyong hinahanap ninyo ay hindi available sa klinikang ito.Pakitype ang serbisyong eksaktong nakalista sa pagpipilian upang mabigyan ka namin ng tamang sagot"
-        : "Sorry, the service you are looking for is not available at this clinic.Please type the service exactly as shown in the options so we can provide the correct response."
-
+        ? "Paumanhin, ang serbisyong hinahanap ninyo ay hindi available sa klinikang ito. Pakitype ang serbisyong eksaktong nakalista sa pagpipilian upang mabigyan ka namin ng tamang sagot."
+        : "Sorry, the service you are looking for is not available at this clinic. Please type the service exactly as shown in the options so we can provide the correct response."
     );
 }
+
 function addBotMessage(text) {
     const botDiv = document.createElement('div');
     botDiv.classList.add('bot-message');
@@ -377,7 +494,6 @@ function addBotMessage(text) {
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-// Optional: simulate full auto-reply without user input
 function simulateUserMessages(messages, interval = 3000) {
     let index = 0;
     function sendNext() {
@@ -398,10 +514,6 @@ function simulateUserMessages(messages, interval = 3000) {
     sendNext();
 }
 
-// Example auto-simulation (remove or comment out if not needed)
-// simulateUserMessages(['What are your hours?', 'Do you offer X-ray?', 'How can I book an appointment?']);
-
-// Optional: reply to real user input
 chatInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter' && chatInput.value.trim() !== '') {
         const userMessage = chatInput.value;
@@ -417,33 +529,29 @@ chatInput.addEventListener('keypress', function(e) {
         }, 1000);
     }
 });
+
 function resetChat() {
-    // Clear all chat messages
     chatBody.innerHTML = '';
-    
-    // Clear the input field
     chatInput.value = '';
 
-    // Show welcome message in the current language
     const welcomeText = currentLang === "tl" 
         ? "Kamusta! Paano namin kayo matutulungan?" 
         : "Hello! How can we assist you today?";
     
     addBotMessage(welcomeText);
 }
+
 // Language setting
 let currentLang = "en";
 
 function setChatLanguage(lang) {
     currentLang = lang;
 
-    // Update input placeholder
     if (chatInput) {
         chatInput.placeholder = (lang === "tl") 
             ? "I-type ang iyong mensahe..." 
             : "Type your message...";
     }
 
-    // Reset the chat when language changes
     resetChat();
 }
