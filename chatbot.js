@@ -29,8 +29,8 @@ const autoReplies = [
     },
     { 
         keywords: ['appointment', 'book', 'pa-appointment'], 
-        reply: { en: 'You can book an appointment by calling us at +123-456-7890 or via our website.', 
-                 tl: 'Maaari kayong magpa-appointment sa pamamagitan ng pagtawag sa +123-456-7890 o sa aming website.' } 
+        reply: { en: 'You can book an appointment by visiting our website.', 
+                 tl: 'Maaari kayong magpa-appointment sa pamamagitan ng pagbisita sa aming website.' } 
     },
     { 
         keywords: ['location', 'address', 'lokasyon'], 
@@ -105,9 +105,9 @@ const autoReplies = [
     { keywords: ['culture and sensitivity'], reply: '₱900.00' },
     { keywords: ['culture only'], reply: '₱600.00' },
     { keywords: ['check-up'], reply: '₱500.00' },
-    { keywords: ['chest x-ray','chest pa','Chest PA','chest PA'], reply: '₱300.00' },
-    { keywords: ['chest x-ray vdr'], reply: '₱500.00' },
-    { keywords: ['chest x-ray ap/lat','ap/lat'], reply: '₱750.00' },
+    { keywords: ['chest xray','chest pa','Chest PA','chest PA'], reply: '₱300.00' },
+    { keywords: ['chest xray vdr'], reply: '₱500.00' },
+    { keywords: ['chest xray ap/lat','ap/lat'], reply: '₱750.00' },
     { keywords: ['cocaine','cocaine test'], reply: '₱500.00' },
     { keywords: ['creamship management'], reply: '₱850.00' },
     { keywords: ['dengue iga'], reply: '₱2,600.00' },
@@ -233,8 +233,8 @@ const autoReplies = [
     { keywords: ['varicella igg'], reply: '₱2,000.00' },
     { keywords: ['varicella igm'], reply: '₱2,000.00' },
     { keywords: ['widal test'], reply: '₱600.00' },
-    { keywords: ['x-ray ap/lat right ankle'], reply: '₱950.00' },
-    { keywords: ['x-ray apolordotic view','apico','APICO','Apico'], reply: '₱550.00' },
+    { keywords: ['xray ap/lat right ankle'], reply: '₱950.00' },
+    { keywords: ['xray apolordotic view','apico','APICO','Apico'], reply: '₱550.00' },
 
 ];
 
@@ -285,11 +285,28 @@ function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
     // Remove "magkano ang" or "how much is"
-    msg = msg.replace(/magkano ang\s+/i, '').replace(/how much is\s+/i, '');
+   msg = msg
+  .replace(/magkano ang\s+/i, '')
+  .replace(/how much is\s+/i, '')
+  .replace(/price of\s+/i, '')
+  .replace(/ano ang presyo ng\s+/i, '')
+       .replace(/how much\s+/i, '')
+       .replace(/is available\s+/i, '')
+       .replace(/do you have\s+/i, '')
+       .replace(/mayroon ba kayong\s+/i, '')
+       .replace(/meron ba kayong\s+/i, '')
+       .replace(/available ba ang inyong\s+/i, '')
+       .replace(/pwede bang magtanong magkano\s+/i, '')
+       .replace(/magkano ang inyong\s+/i, '')
+       .replace(/available\s+/i, '')
+       .replace(/hm ang \s+/i, '')
+       .replace(/do you offer\s+/i, '')
+      
+       ;
 
     // Alias map for shorthand typing
     const aliasMap = {
-        "xray": ["chest x-ray", "chest x-ray vdr", "chest x-ray ap/lat"]
+        "xray": ["chest xray", "chest xray vdr", "chest xray ap/lat"]
     };
 
     // --- 1️⃣ Check general inquiries first ---
