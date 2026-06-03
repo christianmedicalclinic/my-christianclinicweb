@@ -326,25 +326,24 @@ function autoReply(message) {
         typeof r.reply !== "object" // exclude general inquiries
     );
 
-    ```javascript id="x3q9vm"
-// Match keywords even inside long sentences
-const matchedReply = serviceReplies.find(r =>
-    r.keywords.some(k =>
-        msg.includes(k.toLowerCase()) ||
-        k.toLowerCase().includes(msg)
-    )
-);
+ ```javascript id="u8p2zs"
+// Match any keyword inside the sentence
+for (const r of serviceReplies) {
+    for (const keyword of r.keywords) {
 
-if (matchedReply) {
-    addBotMessage(
-        typeof matchedReply.reply === "object"
-            ? (currentLang === "tl"
-                ? matchedReply.reply.tl
-                : matchedReply.reply.en)
-            : matchedReply.reply
-    );
+        if (msg.includes(keyword.toLowerCase())) {
 
-    return;
+            addBotMessage(
+                typeof r.reply === "object"
+                    ? (currentLang === "tl"
+                        ? r.reply.tl
+                        : r.reply.en)
+                    : r.reply
+            );
+
+            return;
+        }
+    }
 }
 ```
 
