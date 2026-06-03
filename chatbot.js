@@ -235,6 +235,10 @@ const autoReplies = [
     { keywords: ['widal test'], reply: '₱600.00' },
     { keywords: ['xray ap/lat right ankle'], reply: '₱950.00' },
     { keywords: ['xray apolordotic view','apico','APICO','Apico'], reply: '₱550.00' },
+    { keywords: ['Tooth extraction','tooth extraction;,'tooth filling','Tooth filling','tooth cleaning','Tooth cleaning'], reply: '₱550.00' },
+    { keywords: ['Dental braces'], reply: 'Price may vary please visit to the clinic' },
+    { keywords: ['ishara test','Ishihara test'], reply: '₱600' },
+    { keywords: ['Eye test','eye test'], reply: '₱550.00' },
 
 ];
 
