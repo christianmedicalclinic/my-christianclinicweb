@@ -285,22 +285,11 @@ function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
     // Remove "magkano ang" or "how much is"
-   // remove "magkano ang" or "how much is"
-msg = msg.replace(/magkano ang\s*/i, '')
-         .replace(/how much is\s*/i, '');
-
-msg = msg.toLowerCase();
-
-// keyword detection
-if (msg.includes("xray")) {
-    reply = "The price of Xray is ₱500";
-}
-else if (msg.includes("cbc")) {
-    reply = "The price of CBC is ₱300";
-}
-else {
-    reply = "Sorry, I don't understand.";
-}
+   msg = msg
+  .replace(/\b(magkano ang|how much is)\b/gi, '')
+  .replace(/\s+/g, ' ')
+  .trim();
+    
     // Alias map for shorthand typing
     const aliasMap = {
         "xray": ["chest x-ray", "chest x-ray vdr", "chest x-ray ap/lat"]
