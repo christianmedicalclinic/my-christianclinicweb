@@ -285,7 +285,10 @@ function autoReply(message) {
     let msg = message.toLowerCase().trim();
 
     // Remove "magkano ang" or "how much is"
-    msg = msg.replace(/magkano ang\s+/i, '').replace(/how much is\s+/i, '');
+    msg = msg.replace(
+  /^(magkano ang|how much is|meron ba kayong|do you have|do you offer|available ba|mayroon ba kayong)\s+/i,
+  ''
+);
 
     // Alias map for shorthand typing
     const aliasMap = {
