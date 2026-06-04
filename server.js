@@ -40,6 +40,12 @@ ALTER TABLE appointments
 ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP
 `);
 
+// ADD PENDING_NOTE COLUMN IF IT DOESN'T EXIST YET
+await db.query(`
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS pending_note TEXT
+`);
+
 console.log('All columns ready');
 
 } catch (err) {
@@ -198,16 +204,16 @@ message: "Failed to fetch completed appointments"
 
 // ------------------------
 // UPDATE APPOINTMENT STATUS
-// (confirm, cancel, or complete - triggers email on confirm/cancel)
+// (confirm, cancel, complete, or pending)
 // ------------------------
 app.patch('/update-appointment/:id', async (req, res) => {
 
 try {
 
 const { id } = req.params;
-const { status } = req.body;
+const { status, pending_note } = req.body;
 
-if (!['confirmed', 'cancelled', 'completed'].includes(status)) {
+if (!['confirmed', 'cancelled', 'completed', 'pending'].includes(status)) {
 return res.status(400).json({ message: "Invalid status." });
 }
 
@@ -223,7 +229,17 @@ return res.status(404).json({ message: "Appointment not found." });
 
 const { fullname, email, phone, service, appointment_date, time } = appt.rows[0];
 
-// UPDATE STATUS - save completed_at timestamp if completed
+// PENDING — save note, no email
+if (status === 'pending') {
+await db.query(
+"UPDATE appointments SET status = $1, pending_note = $2 WHERE id = $3",
+[status, pending_note || null, id]
+);
+console.log("Appointment " + id + " moved to pending. Note: " + (pending_note || 'none'));
+return res.json({ message: "Appointment moved to pending." });
+}
+
+// COMPLETED — save timestamp, no email
 if (status === 'completed') {
 await db.query(
 "UPDATE appointments SET status = $1, completed_at = NOW() WHERE id = $2",
@@ -231,12 +247,13 @@ await db.query(
 );
 console.log("Appointment " + id + " completed - no email sent.");
 return res.json({ message: "Appointment marked as completed." });
-} else {
+}
+
+// CONFIRMED or CANCELLED — update status then send email
 await db.query(
 "UPDATE appointments SET status = $1 WHERE id = $2",
 [status, id]
 );
-}
 
 console.log("Appointment " + id + " marked as " + status);
 
