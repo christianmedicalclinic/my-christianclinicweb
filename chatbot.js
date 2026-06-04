@@ -33,7 +33,7 @@ const autoReplies = [
                  tl: 'Maaari kayong magpa-appointment sa pamamagitan ng pagbisita sa aming website.' } 
     },
     { 
-        keywords: ['location', 'address', 'lokasyon'], 
+        keywords: ['location', 'address', 'lokasyon','located'], 
         reply: { en: 'We are located at 22B Madison Street, Brgy.Mariana, Quezon City.', 
                  tl: 'Matatagpuan ang aming klinika sa 22B Madison Street, Brgy. Mariana, Quezon City.' } 
     },
