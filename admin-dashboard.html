@@ -332,6 +332,11 @@ background: #d0f0e8;
 color: #0a5c44;
 }
 
+.status-badge.pending {
+background: #fff3cd;
+color: #856404;
+}
+
 /* BOOKED ON BADGE */
 .booked-on {
 display: inline-block;
@@ -345,8 +350,6 @@ background: #fff3cd;
 color: #856404;
 border: 1px solid #ffc107;
 }
-
-
 
 /* ACTION BUTTONS */
 .action-btns {
@@ -383,6 +386,22 @@ font-size: 13px;
 
 .cancel-appt-btn:hover {
 background: #545b62;
+}
+
+/* PENDING BUTTON (on confirmed card) */
+.pending-btn {
+background: #e0a800;
+color: #fff;
+border: none;
+padding: 5px 12px;
+border-radius: 5px;
+cursor: pointer;
+font-size: 13px;
+font-weight: bold;
+}
+
+.pending-btn:hover {
+background: #c79200;
 }
 
 /* COMPLETED BUTTON */
@@ -423,6 +442,10 @@ text-align: center;
 font-size: 2rem;
 font-weight: bold;
 color: #0a7c5c;
+}
+
+.summary-card .count.pending-count {
+color: #e0a800;
 }
 
 .summary-card .label {
@@ -535,6 +558,207 @@ font-size: 2.5rem;
 margin-bottom: 10px;
 }
 
+/* ── PENDING TAB STYLES ── */
+.pending-summary {
+display: flex;
+gap: 16px;
+margin-bottom: 24px;
+flex-wrap: wrap;
+}
+
+.pending-service-folder {
+margin-bottom: 15px;
+border: 1px solid #ffd97d;
+border-radius: 8px;
+background: #fffdf0;
+}
+
+.pending-service-header {
+background: #c79200;
+color: white;
+padding: 10px 14px;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-weight: bold;
+border-radius: 8px 8px 0 0;
+font-size: 0.95rem;
+}
+
+.pending-service-header:hover {
+background: #a87a00;
+}
+
+.pending-service-content {
+padding: 10px;
+}
+
+.pending-date-folder {
+margin-bottom: 10px;
+border: 1px solid #ffd97d;
+border-radius: 6px;
+background: #fff;
+}
+
+.pending-date-header {
+background: #e0a800;
+color: white;
+padding: 7px 12px;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-weight: bold;
+border-radius: 6px 6px 0 0;
+font-size: 0.9rem;
+}
+
+.pending-date-header:hover {
+background: #c79200;
+}
+
+.pending-date-content {
+padding: 8px;
+}
+
+.pending-row {
+background: #fff;
+border: 1px solid #ffd97d;
+border-radius: 8px;
+padding: 10px 14px;
+margin-bottom: 8px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 8px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.pending-row .info {
+flex: 1;
+min-width: 200px;
+}
+
+.pending-row .info p {
+margin: 3px 0;
+font-size: 0.88rem;
+color: #333;
+}
+
+.pending-badge {
+background: #fff3cd;
+color: #856404;
+font-size: 11px;
+padding: 3px 10px;
+border-radius: 20px;
+font-weight: bold;
+border: 1px solid #ffc107;
+}
+
+/* PENDING NOTE MODAL */
+.modal-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.45);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+}
+
+.modal-box {
+background: #fff;
+border-radius: 12px;
+padding: 28px 28px 22px;
+width: 100%;
+max-width: 420px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.modal-box h4 {
+margin: 0 0 6px;
+color: #c79200;
+font-size: 1.05rem;
+}
+
+.modal-box p {
+margin: 0 0 14px;
+font-size: 0.88rem;
+color: #555;
+}
+
+.modal-box textarea {
+width: 100%;
+height: 100px;
+border: 1px solid #ccc;
+border-radius: 8px;
+padding: 10px;
+font-size: 0.95rem;
+font-family: inherit;
+resize: vertical;
+box-sizing: border-box;
+}
+
+.modal-box textarea:focus {
+outline: none;
+border-color: #e0a800;
+box-shadow: 0 0 0 2px rgba(224,168,0,0.2);
+}
+
+.modal-actions {
+display: flex;
+gap: 10px;
+margin-top: 14px;
+justify-content: flex-end;
+}
+
+.modal-confirm-btn {
+background: #e0a800;
+color: #fff;
+border: none;
+padding: 8px 20px;
+border-radius: 8px;
+font-size: 0.95rem;
+font-weight: bold;
+cursor: pointer;
+}
+
+.modal-confirm-btn:hover {
+background: #c79200;
+}
+
+.modal-cancel-btn {
+background: #6c757d;
+color: #fff;
+border: none;
+padding: 8px 18px;
+border-radius: 8px;
+font-size: 0.95rem;
+cursor: pointer;
+}
+
+.modal-cancel-btn:hover {
+background: #545b62;
+}
+
+/* PENDING NOTE DISPLAY */
+.pending-note-box {
+background: #fffbe6;
+border: 1px solid #ffc107;
+border-left: 4px solid #e0a800;
+border-radius: 6px;
+padding: 7px 10px;
+margin-top: 6px;
+font-size: 0.85rem;
+color: #6d4c00;
+}
+
+.pending-note-box strong {
+color: #c79200;
+}
+
 /* MESSAGES */
 .msg-box-msg {
 background: #fff;
@@ -548,7 +772,6 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
    PRINT STYLES
 ======================== */
 @media print {
-  /* Hide everything not needed */
   header,
   .tabs,
   .search-bar,
@@ -557,8 +780,10 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
   .confirm-btn,
   .cancel-appt-btn,
   .complete-btn,
+  .pending-btn,
   .status-folder:not(.confirmed-folder-wrapper),
   #completed-tab,
+  #pending-tab,
   #messages-tab {
     display: none !important;
   }
@@ -574,7 +799,6 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     padding: 10px 20px;
   }
 
-  /* Print header shown only on print */
   #print-header {
     display: block !important;
     text-align: center;
@@ -595,12 +819,10 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     color: #555;
   }
 
-  /* Show confirmed-only print table */
   #print-confirmed-area {
     display: block !important;
   }
 
-  /* Hide the normal appointments div on print */
   #appointments {
     display: none !important;
   }
@@ -665,12 +887,9 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     background: #f9fff9;
   }
 
-
-
   h3 { display: none; }
 }
 
-/* Hide print-only elements on screen */
 #print-header {
   display: none;
 }
@@ -695,6 +914,7 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 <!-- TABS -->
 <div class="tabs">
 <button class="tab-btn active" onclick="switchTab('appointments-tab', this)">📅 Booked Appointments</button>
+<button class="tab-btn" onclick="switchTab('pending-tab', this)">⏳ Pending Services</button>
 <button class="tab-btn" onclick="switchTab('completed-tab', this)">✅ Completed Services</button>
 <button class="tab-btn" onclick="switchTab('messages-tab', this)">💬 Patient Messages</button>
 </div>
@@ -704,7 +924,6 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 <h3>Booked Appointments</h3>
 
-<!-- SEARCH BAR -->
 <div class="search-bar">
 <input type="date" id="searchDate">
 <button onclick="searchDate()">🔍 Find</button>
@@ -714,12 +933,28 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 <div id="appointments"></div>
 
-<!-- PRINT-ONLY AREA (hidden on screen, shown when printing) -->
+<!-- PRINT-ONLY AREA -->
 <div id="print-header">
   <h2>📋 Confirmed Appointments</h2>
   <p id="print-subtitle"></p>
 </div>
 <div id="print-confirmed-area"></div>
+
+</div>
+
+<!-- TAB: PENDING SERVICES -->
+<div id="pending-tab" class="tab-panel">
+
+<h3>Pending Services</h3>
+
+<div class="pending-summary" id="pending-summary"></div>
+
+<div class="search-bar">
+<input type="text" id="pendingSearch" placeholder="Search by name or service..." oninput="filterPending()">
+<button class="clear-btn" onclick="clearPendingSearch()">✖ Clear</button>
+</div>
+
+<div id="pending-list"></div>
 
 </div>
 
@@ -749,7 +984,21 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 </section>
 
+<!-- PENDING NOTE MODAL -->
+<div id="pendingModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closePendingModal()">
+  <div class="modal-box">
+    <h4>⏳ Move to Pending</h4>
+    <p>Enter a reason or note for why this appointment is being set to pending (optional).</p>
+    <textarea id="pendingNoteInput" placeholder="e.g. Waiting for lab results, Patient requested reschedule..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closePendingModal()">Cancel</button>
+      <button class="modal-confirm-btn" onclick="confirmPendingModal()">⏳ Confirm Pending</button>
+    </div>
+  </div>
+</div>
+
 <script>
+
 
 /* =========================
 TAB SWITCHING
@@ -760,6 +1009,7 @@ document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
 document.getElementById(tabId).classList.add('active');
 btn.classList.add('active');
 
+if (tabId === 'pending-tab') loadPending();
 if (tabId === 'completed-tab') loadCompleted();
 if (tabId === 'messages-tab') loadMessages();
 }
@@ -883,6 +1133,42 @@ console.log(error);
 }
 }
 
+/* Move confirmed → pending */
+/* Pending modal state */
+let _pendingTargetId = null;
+
+function moveAppointmentToPending(id) {
+_pendingTargetId = id;
+document.getElementById("pendingNoteInput").value = "";
+document.getElementById("pendingModal").style.display = "flex";
+setTimeout(() => document.getElementById("pendingNoteInput").focus(), 50);
+}
+
+function closePendingModal() {
+document.getElementById("pendingModal").style.display = "none";
+_pendingTargetId = null;
+}
+
+async function confirmPendingModal() {
+if (!_pendingTargetId) return;
+const note = document.getElementById("pendingNoteInput").value.trim();
+try {
+const response = await fetch(`/update-appointment/${_pendingTargetId}`, {
+method: 'PATCH',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ status: 'pending', pending_note: note })
+});
+const result = await response.json();
+closePendingModal();
+alert(result.message || "Appointment moved to Pending.");
+loadAppointments();
+} catch (error) {
+console.log(error);
+closePendingModal();
+}
+}
+
+/* Move pending → completed */
 async function completeAppointment(id) {
 if (!confirm("Mark this appointment as completed? It will be moved to the Completed Services folder.")) return;
 try {
@@ -903,7 +1189,11 @@ function renderAppointments(appointments, filterDate) {
 
 let container = document.getElementById("appointments");
 
-const activeAppointments = appointments.filter(a => (a.status || 'new') !== 'completed');
+/* Active = not completed, not pending */
+const activeAppointments = appointments.filter(a => {
+const s = a.status || 'new';
+return s !== 'completed' && s !== 'pending';
+});
 
 if (activeAppointments.length === 0) {
 container.innerHTML = "<p>No appointments yet.</p>";
@@ -1030,7 +1320,6 @@ groupedByTime[app.time].push(app);
 
 Object.keys(groupedByTime).sort().forEach(time => {
 
-// Sort by created_at so first booked is index 0
 const sortedByBookedTime = groupedByTime[time].slice().sort((a, b) => {
 return new Date(a.created_at) - new Date(b.created_at);
 });
@@ -1082,11 +1371,12 @@ actionRow.appendChild(cancelBtn);
 }
 
 if (appStatus === 'confirmed') {
-let completeBtn = document.createElement("button");
-completeBtn.className = "complete-btn";
-completeBtn.textContent = "✔ Completed";
-completeBtn.onclick = () => completeAppointment(app.id);
-actionRow.appendChild(completeBtn);
+/* Pending button — moves to Pending tab */
+let pendingBtn = document.createElement("button");
+pendingBtn.className = "pending-btn";
+pendingBtn.textContent = "⏳ Pending";
+pendingBtn.onclick = () => moveAppointmentToPending(app.id);
+actionRow.appendChild(pendingBtn);
 }
 
 let deleteBtn = document.createElement("button");
@@ -1172,10 +1462,8 @@ PRINT CONFIRMED
 function printConfirmed() {
   const filterDate = document.getElementById("searchDate").value || null;
 
-  // Get only confirmed, non-completed appointments
   let confirmed = allAppointments.filter(a => (a.status || 'new') === 'confirmed');
 
-  // If a date filter is active, narrow it down
   if (filterDate) {
     confirmed = confirmed.filter(a => {
       const d = new Date(a.appointment_date);
@@ -1189,7 +1477,6 @@ function printConfirmed() {
     return;
   }
 
-  // Group by date → service → time
   const byDate = {};
   confirmed.forEach(app => {
     const date = app.appointment_date;
@@ -1200,7 +1487,6 @@ function printConfirmed() {
     byDate[date][svc][app.time].push(app);
   });
 
-  // Sort each time slot by created_at so first booked = index 0
   Object.keys(byDate).forEach(date => {
     Object.keys(byDate[date]).forEach(svc => {
       Object.keys(byDate[date][svc]).forEach(time => {
@@ -1209,7 +1495,6 @@ function printConfirmed() {
     });
   });
 
-  // Build print HTML
   const printArea = document.getElementById("print-confirmed-area");
   const subtitle = document.getElementById("print-subtitle");
 
@@ -1262,6 +1547,189 @@ function printConfirmed() {
 
   printArea.innerHTML = html;
   window.print();
+}
+
+
+/* =========================
+PENDING SERVICES
+========================= */
+
+let allPending = [];
+
+async function loadPending() {
+const listEl = document.getElementById("pending-list");
+const summaryEl = document.getElementById("pending-summary");
+listEl.innerHTML = "<p style='color:#888;'>Loading...</p>";
+
+try {
+/* Reuse the main appointments endpoint and filter client-side,
+   OR use /pending-appointments if your backend exposes it */
+const response = await fetch('/appointments');
+const data = await response.json();
+allPending = data.filter(a => (a.status || '') === 'pending');
+renderPending(allPending);
+} catch (error) {
+console.log("FETCH ERROR:", error);
+listEl.innerHTML = "<p>Failed to load pending appointments.</p>";
+}
+}
+
+function filterPending() {
+const q = document.getElementById("pendingSearch").value.toLowerCase();
+if (!q) { renderPending(allPending); return; }
+const filtered = allPending.filter(a =>
+a.fullname.toLowerCase().includes(q) ||
+(a.service || '').toLowerCase().includes(q)
+);
+renderPending(filtered);
+}
+
+function clearPendingSearch() {
+document.getElementById("pendingSearch").value = "";
+renderPending(allPending);
+}
+
+function renderPending(data) {
+const listEl = document.getElementById("pending-list");
+const summaryEl = document.getElementById("pending-summary");
+
+const totalCount = data.length;
+const serviceMap = {};
+data.forEach(a => {
+const s = a.service || 'Unknown';
+serviceMap[s] = (serviceMap[s] || 0) + 1;
+});
+const uniqueServices = Object.keys(serviceMap).length;
+
+summaryEl.innerHTML = `
+<div class="summary-card">
+<div class="count pending-count">${totalCount}</div>
+<div class="label">Total Pending</div>
+</div>
+<div class="summary-card">
+<div class="count pending-count">${uniqueServices}</div>
+<div class="label">Service Types</div>
+</div>
+`;
+
+if (data.length === 0) {
+listEl.innerHTML = `
+<div class="no-completed">
+<div class="icon">⏳</div>
+<p>No pending appointments yet.</p>
+</div>
+`;
+return;
+}
+
+listEl.innerHTML = "";
+
+const groupedByService = {};
+data.forEach(app => {
+const s = app.service || 'Unknown Service';
+if (!groupedByService[s]) groupedByService[s] = [];
+groupedByService[s].push(app);
+});
+
+Object.keys(groupedByService).sort().forEach(service => {
+
+const appts = groupedByService[service];
+
+let folder = document.createElement("div");
+folder.className = "pending-service-folder";
+
+let fHeader = document.createElement("div");
+fHeader.className = "pending-service-header";
+fHeader.innerHTML = `
+<span>📁 ${service}</span>
+<span>${appts.length} pending</span>
+`;
+folder.appendChild(fHeader);
+
+let fContent = document.createElement("div");
+fContent.className = "pending-service-content";
+fContent.style.display = "block";
+
+const groupedByDate = {};
+appts.forEach(app => {
+const d = app.appointment_date;
+if (!groupedByDate[d]) groupedByDate[d] = [];
+groupedByDate[d].push(app);
+});
+
+Object.keys(groupedByDate).sort().reverse().forEach(date => {
+
+const dateAppts = groupedByDate[date];
+
+let dateFolder = document.createElement("div");
+dateFolder.className = "pending-date-folder";
+
+let dateHeader = document.createElement("div");
+dateHeader.className = "pending-date-header";
+dateHeader.innerHTML = `
+<span>📅 ${formatDate(date)}</span>
+<span>${dateAppts.length} patient(s)</span>
+`;
+dateFolder.appendChild(dateHeader);
+
+let dateContent = document.createElement("div");
+dateContent.className = "pending-date-content";
+dateContent.style.display = "block";
+
+dateAppts.forEach(app => {
+let row = document.createElement("div");
+row.className = "pending-row";
+
+let infoDiv = document.createElement("div");
+infoDiv.className = "info";
+infoDiv.innerHTML = `
+<p><strong>${app.fullname}</strong></p>
+<p>${app.email} &nbsp;|&nbsp; ${app.phone}</p>
+<p>Appointment Time: ${formatTime(app.time)}</p>
+<p style="font-size:11px; color:#888;">Booked on: ${formatBookedOn(app.created_at)}</p>
+${app.pending_note ? `<div class="pending-note-box"><strong>📝 Note:</strong> ${app.pending_note}</div>` : ''}
+`;
+
+let actionDiv = document.createElement("div");
+actionDiv.style.display = "flex";
+actionDiv.style.flexDirection = "column";
+actionDiv.style.alignItems = "flex-end";
+actionDiv.style.gap = "6px";
+
+let badge = document.createElement("span");
+badge.className = "pending-badge";
+badge.textContent = "Pending";
+actionDiv.appendChild(badge);
+
+let completeBtn = document.createElement("button");
+completeBtn.className = "complete-btn";
+completeBtn.textContent = "✔ Mark as Completed";
+completeBtn.onclick = async () => {
+await completeAppointment(app.id);
+loadPending();
+};
+actionDiv.appendChild(completeBtn);
+
+row.appendChild(infoDiv);
+row.appendChild(actionDiv);
+dateContent.appendChild(row);
+});
+
+dateFolder.appendChild(dateContent);
+fContent.appendChild(dateFolder);
+
+dateHeader.addEventListener("click", () => {
+dateContent.style.display = dateContent.style.display === "none" ? "block" : "none";
+});
+});
+
+folder.appendChild(fContent);
+listEl.appendChild(folder);
+
+fHeader.addEventListener("click", () => {
+fContent.style.display = fContent.style.display === "none" ? "block" : "none";
+});
+});
 }
 
 
