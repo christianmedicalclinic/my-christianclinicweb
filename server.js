@@ -302,7 +302,7 @@ sendSmtpEmail.htmlContent = `
 <ul style="margin: 10px 0 0 20px;">
 <li>Please arrive <strong>10-15 minutes before</strong> your scheduled time.</li>
 <li>Late arrivals may result in your slot being given to the next patient.</li>
-<li>Bring a valid ID and any relevant medical records.</li>
+<li>Bring a 2 xerox copy of valid ID,3 pcs 2x2 picture and you can download and print the printable form you can see it in the website.</li>
 <li>If you need to cancel or reschedule, please call us at least <strong>1 day before</strong> your appointment.</li>
 </ul>
 </div>
