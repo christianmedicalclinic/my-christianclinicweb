@@ -769,133 +769,133 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
 
 /* ========================
-   PRINT STYLES
+PRINT STYLES
 ======================== */
 @media print {
-  header,
-  .tabs,
-  .search-bar,
-  .action-btns,
-  .delete-btn,
-  .confirm-btn,
-  .cancel-appt-btn,
-  .complete-btn,
-  .pending-btn,
-  .status-folder:not(.confirmed-folder-wrapper),
-  #completed-tab,
-  #pending-tab,
-  #messages-tab {
-    display: none !important;
-  }
+header,
+.tabs,
+.search-bar,
+.action-btns,
+.delete-btn,
+.confirm-btn,
+.cancel-appt-btn,
+.complete-btn,
+.pending-btn,
+.status-folder:not(.confirmed-folder-wrapper),
+#completed-tab,
+#pending-tab,
+#messages-tab {
+display: none !important;
+}
 
-  body {
-    background: #fff;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-  }
+body {
+background: #fff;
+font-family: "Segoe UI", Tahoma, sans-serif;
+}
 
-  section.container {
-    max-width: 100%;
-    margin: 0;
-    padding: 10px 20px;
-  }
-
-  #print-header {
-    display: block !important;
-    text-align: center;
-    margin-bottom: 16px;
-    border-bottom: 2px solid #0a8f08;
-    padding-bottom: 10px;
-  }
-
-  #print-header h2 {
-    margin: 0;
-    font-size: 1.3rem;
-    color: #0a8f08;
-  }
-
-  #print-header p {
-    margin: 4px 0 0;
-    font-size: 0.85rem;
-    color: #555;
-  }
-
-  #print-confirmed-area {
-    display: block !important;
-  }
-
-  #appointments {
-    display: none !important;
-  }
-
-  .print-date-section {
-    margin-bottom: 20px;
-    page-break-inside: avoid;
-  }
-
-  .print-date-title {
-    background: #0a8f08;
-    color: #fff;
-    padding: 7px 12px;
-    font-weight: bold;
-    font-size: 1rem;
-    border-radius: 6px 6px 0 0;
-    margin-bottom: 0;
-  }
-
-  .print-service-title {
-    background: #e8f5e9;
-    color: #117b0b;
-    padding: 5px 12px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    border-left: 3px solid #0a8f08;
-    margin: 6px 0 4px;
-  }
-
-  .print-time-title {
-    padding: 4px 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #333;
-    background: #f0f0f0;
-    margin-bottom: 2px;
-  }
-
-  .print-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-    margin-bottom: 6px;
-  }
-
-  .print-table th {
-    background: #d4edda;
-    color: #155724;
-    padding: 5px 8px;
-    text-align: left;
-    border: 1px solid #ccc;
-    font-size: 0.78rem;
-  }
-
-  .print-table td {
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    vertical-align: top;
-  }
-
-  .print-table tr:nth-child(even) td {
-    background: #f9fff9;
-  }
-
-  h3 { display: none; }
+section.container {
+max-width: 100%;
+margin: 0;
+padding: 10px 20px;
 }
 
 #print-header {
-  display: none;
+display: block !important;
+text-align: center;
+margin-bottom: 16px;
+border-bottom: 2px solid #0a8f08;
+padding-bottom: 10px;
+}
+
+#print-header h2 {
+margin: 0;
+font-size: 1.3rem;
+color: #0a8f08;
+}
+
+#print-header p {
+margin: 4px 0 0;
+font-size: 0.85rem;
+color: #555;
 }
 
 #print-confirmed-area {
-  display: none;
+display: block !important;
+}
+
+#appointments {
+display: none !important;
+}
+
+.print-date-section {
+margin-bottom: 20px;
+page-break-inside: avoid;
+}
+
+.print-date-title {
+background: #0a8f08;
+color: #fff;
+padding: 7px 12px;
+font-weight: bold;
+font-size: 1rem;
+border-radius: 6px 6px 0 0;
+margin-bottom: 0;
+}
+
+.print-service-title {
+background: #e8f5e9;
+color: #117b0b;
+padding: 5px 12px;
+font-weight: bold;
+font-size: 0.9rem;
+border-left: 3px solid #0a8f08;
+margin: 6px 0 4px;
+}
+
+.print-time-title {
+padding: 4px 12px;
+font-size: 0.85rem;
+font-weight: bold;
+color: #333;
+background: #f0f0f0;
+margin-bottom: 2px;
+}
+
+.print-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.82rem;
+margin-bottom: 6px;
+}
+
+.print-table th {
+background: #d4edda;
+color: #155724;
+padding: 5px 8px;
+text-align: left;
+border: 1px solid #ccc;
+font-size: 0.78rem;
+}
+
+.print-table td {
+padding: 5px 8px;
+border: 1px solid #ddd;
+vertical-align: top;
+}
+
+.print-table tr:nth-child(even) td {
+background: #f9fff9;
+}
+
+h3 { display: none; }
+}
+
+#print-header {
+display: none;
+}
+
+#print-confirmed-area {
+display: none;
 }
 </style>
 </head>
@@ -935,8 +935,8 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 <!-- PRINT-ONLY AREA -->
 <div id="print-header">
-  <h2>📋 Confirmed Appointments</h2>
-  <p id="print-subtitle"></p>
+<h2>📋 Confirmed Appointments</h2>
+<p id="print-subtitle"></p>
 </div>
 <div id="print-confirmed-area"></div>
 
@@ -986,15 +986,15 @@ box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 
 <!-- PENDING NOTE MODAL -->
 <div id="pendingModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closePendingModal()">
-  <div class="modal-box">
-    <h4>⏳ Move to Pending</h4>
-    <p>Enter a reason or note for why this appointment is being set to pending (optional).</p>
-    <textarea id="pendingNoteInput" placeholder="e.g. Waiting for lab results, Patient requested reschedule..."></textarea>
-    <div class="modal-actions">
-      <button class="modal-cancel-btn" onclick="closePendingModal()">Cancel</button>
-      <button class="modal-confirm-btn" onclick="confirmPendingModal()">⏳ Confirm Pending</button>
-    </div>
-  </div>
+<div class="modal-box">
+<h4>⏳ Move to Pending</h4>
+<p>Enter a reason or note for why this appointment is being set to pending (optional).</p>
+<textarea id="pendingNoteInput" placeholder="e.g. Waiting for lab results, Patient requested reschedule..."></textarea>
+<div class="modal-actions">
+<button class="modal-cancel-btn" onclick="closePendingModal()">Cancel</button>
+<button class="modal-confirm-btn" onclick="confirmPendingModal()">⏳ Confirm Pending</button>
+</div>
+</div>
 </div>
 
 <script>
@@ -1370,8 +1370,14 @@ cancelBtn.onclick = () => cancelAppointment(app.id);
 actionRow.appendChild(cancelBtn);
 }
 
+// ✅ FIX: Confirmed appointments now have Complete + Pending + Delete
 if (appStatus === 'confirmed') {
-/* Pending button — moves to Pending tab */
+let completeBtn = document.createElement("button");
+completeBtn.className = "complete-btn";
+completeBtn.textContent = "✔ Complete";
+completeBtn.onclick = () => completeAppointment(app.id);
+actionRow.appendChild(completeBtn);
+
 let pendingBtn = document.createElement("button");
 pendingBtn.className = "pending-btn";
 pendingBtn.textContent = "⏳ Pending";
@@ -1379,6 +1385,7 @@ pendingBtn.onclick = () => moveAppointmentToPending(app.id);
 actionRow.appendChild(pendingBtn);
 }
 
+// Delete button shown for all statuses
 let deleteBtn = document.createElement("button");
 deleteBtn.className = "delete-btn";
 deleteBtn.textContent = "Delete";
@@ -1460,93 +1467,93 @@ console.log(error);
 PRINT CONFIRMED
 ========================= */
 function printConfirmed() {
-  const filterDate = document.getElementById("searchDate").value || null;
+const filterDate = document.getElementById("searchDate").value || null;
 
-  let confirmed = allAppointments.filter(a => (a.status || 'new') === 'confirmed');
+let confirmed = allAppointments.filter(a => (a.status || 'new') === 'confirmed');
 
-  if (filterDate) {
-    confirmed = confirmed.filter(a => {
-      const d = new Date(a.appointment_date);
-      const local = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
-      return local === filterDate;
-    });
-  }
+if (filterDate) {
+confirmed = confirmed.filter(a => {
+const d = new Date(a.appointment_date);
+const local = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+return local === filterDate;
+});
+}
 
-  if (confirmed.length === 0) {
-    alert("No confirmed appointments to print" + (filterDate ? " for this date." : "."));
-    return;
-  }
+if (confirmed.length === 0) {
+alert("No confirmed appointments to print" + (filterDate ? " for this date." : "."));
+return;
+}
 
-  const byDate = {};
-  confirmed.forEach(app => {
-    const date = app.appointment_date;
-    if (!byDate[date]) byDate[date] = {};
-    const svc = app.service || 'Unknown Service';
-    if (!byDate[date][svc]) byDate[date][svc] = {};
-    if (!byDate[date][svc][app.time]) byDate[date][svc][app.time] = [];
-    byDate[date][svc][app.time].push(app);
-  });
+const byDate = {};
+confirmed.forEach(app => {
+const date = app.appointment_date;
+if (!byDate[date]) byDate[date] = {};
+const svc = app.service || 'Unknown Service';
+if (!byDate[date][svc]) byDate[date][svc] = {};
+if (!byDate[date][svc][app.time]) byDate[date][svc][app.time] = [];
+byDate[date][svc][app.time].push(app);
+});
 
-  Object.keys(byDate).forEach(date => {
-    Object.keys(byDate[date]).forEach(svc => {
-      Object.keys(byDate[date][svc]).forEach(time => {
-        byDate[date][svc][time].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-      });
-    });
-  });
+Object.keys(byDate).forEach(date => {
+Object.keys(byDate[date]).forEach(svc => {
+Object.keys(byDate[date][svc]).forEach(time => {
+byDate[date][svc][time].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+});
+});
+});
 
-  const printArea = document.getElementById("print-confirmed-area");
-  const subtitle = document.getElementById("print-subtitle");
+const printArea = document.getElementById("print-confirmed-area");
+const subtitle = document.getElementById("print-subtitle");
 
-  const dateLabel = filterDate
-    ? formatDate(filterDate + 'T00:00:00')
-    : "All Dates";
-  const now = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
-  subtitle.textContent = `Date: ${dateLabel}  |  Printed on: ${now}`;
+const dateLabel = filterDate
+? formatDate(filterDate + 'T00:00:00')
+: "All Dates";
+const now = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
+subtitle.textContent = `Date: ${dateLabel} | Printed on: ${now}`;
 
-  let html = "";
+let html = "";
 
-  Object.keys(byDate).sort().forEach(date => {
-    html += `<div class="print-date-section">`;
-    html += `<div class="print-date-title">📅 ${formatDate(date)}</div>`;
+Object.keys(byDate).sort().forEach(date => {
+html += `<div class="print-date-section">`;
+html += `<div class="print-date-title">📅 ${formatDate(date)}</div>`;
 
-    Object.keys(byDate[date]).sort().forEach(svc => {
-      html += `<div class="print-service-title">📁 ${svc}</div>`;
+Object.keys(byDate[date]).sort().forEach(svc => {
+html += `<div class="print-service-title">📁 ${svc}</div>`;
 
-      Object.keys(byDate[date][svc]).sort().forEach(time => {
-        const patients = byDate[date][svc][time];
-        html += `<div class="print-time-title">🕐 ${formatTime(time)} — ${patients.length} confirmed</div>`;
-        html += `<table class="print-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Booked On</th>
-            </tr>
-          </thead>
-          <tbody>`;
+Object.keys(byDate[date][svc]).sort().forEach(time => {
+const patients = byDate[date][svc][time];
+html += `<div class="print-time-title">🕐 ${formatTime(time)} — ${patients.length} confirmed</div>`;
+html += `<table class="print-table">
+<thead>
+<tr>
+<th>#</th>
+<th>Name</th>
+<th>Phone</th>
+<th>Email</th>
+<th>Booked On</th>
+</tr>
+</thead>
+<tbody>`;
 
-        patients.forEach((app, idx) => {
-          html += `<tr>
-            <td>${idx + 1}</td>
-            <td>${app.fullname}</td>
-            <td>${app.phone}</td>
-            <td>${app.email}</td>
-            <td>${formatBookedOn(app.created_at)}</td>
-          </tr>`;
-        });
+patients.forEach((app, idx) => {
+html += `<tr>
+<td>${idx + 1}</td>
+<td>${app.fullname}</td>
+<td>${app.phone}</td>
+<td>${app.email}</td>
+<td>${formatBookedOn(app.created_at)}</td>
+</tr>`;
+});
 
-        html += `</tbody></table>`;
-      });
-    });
+html += `</tbody></table>`;
+});
+});
 
-    html += `</div>`;
-  });
+html += `</div>`;
+});
 
-  printArea.innerHTML = html;
-  window.print();
+printArea.innerHTML = html;
+window.print();
 }
 
 
@@ -1562,8 +1569,6 @@ const summaryEl = document.getElementById("pending-summary");
 listEl.innerHTML = "<p style='color:#888;'>Loading...</p>";
 
 try {
-/* Reuse the main appointments endpoint and filter client-side,
-   OR use /pending-appointments if your backend exposes it */
 const response = await fetch('/appointments');
 const data = await response.json();
 allPending = data.filter(a => (a.status || '') === 'pending');
