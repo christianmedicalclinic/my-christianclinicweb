@@ -290,6 +290,7 @@ function autoReply(message) {
 
     // Remove "magkano ang" or "how much is"
    msg = msg
+       .replace(/available ba ang\s+/i, '')
   .replace(/magkano ang\s+/i, '')
   .replace(/how much is\s+/i, '')
   .replace(/price of\s+/i, '')
@@ -300,7 +301,7 @@ function autoReply(message) {
        .replace(/mayroon ba kayong\s+/i, '')
        .replace(/meron ba kayong\s+/i, '')
        .replace(/available ba ang inyong\s+/i, '')
-       .replace(/pwede bang magtanong magkano\s+/i, '')
+       .replace(/pwede bang magtanong magkano ang\s+/i, '')
        .replace(/magkano ang inyong\s+/i, '')
        .replace(/available\s+/i, '')
        .replace(/hm ang\s+/i, '')
